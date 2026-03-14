@@ -2,8 +2,7 @@ name: Semgrep
 
 on:
   push:
-    branches:
-      - "ci/security-scan"
+    pull_request: {}
 
 jobs:
   semgrep_scan:
@@ -22,7 +21,7 @@ jobs:
       - name: Perform Semgrep Analysis
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: semgrep ci --exclude=*.lock --sarif --sarif-output=semgrep-results.sarif
+        run: semgrep scan --config=auto --exclude=*.lock --sarif --sarif-output=semgrep-results.sarif
 
       - name: Generate HTML report
         run: |
