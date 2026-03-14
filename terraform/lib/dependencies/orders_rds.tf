@@ -21,6 +21,7 @@ module "orders_rds" {
   password = random_string.orders_db_master.result
   port     = 5432
 
+  manage_master_user_password = false
   vpc_security_group_ids = [var.orders_security_group_id]
   db_subnet_group_name   = "${var.environment_name}-orders-subnet"
   publicly_accessible    = false

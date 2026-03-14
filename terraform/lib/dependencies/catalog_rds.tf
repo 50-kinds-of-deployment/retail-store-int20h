@@ -20,7 +20,7 @@ module "catalog_rds" {
   username = "catalyst"
   password = random_string.catalog_db_master.result
   port     = 3306
-
+  manage_master_user_password = false
   vpc_security_group_ids = [var.catalog_security_group_id]
   db_subnet_group_name   = "${var.environment_name}-catalog-subnet"
   publicly_accessible    = false
