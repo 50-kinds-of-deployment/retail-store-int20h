@@ -1,0 +1,90 @@
+name: Terraform Plan
+
+on:
+  workflow_call:
+    outputs:
+      plan_exitcode:
+        description: "The exit code of the terraform plan command"
+        value: ${{ jobs.plan.outputs.plan_exitcode }}
+    inputs:
+      layer:
+        description: 'Layer name to plan (bootstrap, ops, app)'
+        required: true
+        type: string
+
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./terraform/layers/${{ inputs.layer }}
+    env:
+      TF_IN_AUTOMATION: true
+    outputs:
+      plan_exitcode: ${{ steps.tf_plan.outputs.plan_exitcode }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Set working directory for app layer
+        id: workdir
+        run: |
+          if [ "${{ inputs.layer }}" == "app" ]; then
+            echo "dir=./terraform/layers/app" >> $GITHUB_OUTPUT
+            # In our current structure, environments aren't directory-based,
+            # but this structure is left here mapping to what was requested.
+          else
+            echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+          fi
+        working-directory: .
+
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: ${{ steps.workdir.outputs.dir }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ steps.workdir.outputs.dir }}
+
+      - name: Terraform Plan
+        id: tf_plan
+        working-directory: ${{ steps.workdir.outputs.dir }}
+        run: |
+          set +e
+
+          PLAN_ARGS="-detailed-exitcode -input=false -out=$PWD/tfplan"    
+
+          terraform plan $PLAN_ARGS
+          exitcode=$?
+          echo "plan_exitcode=$exitcode" >> $GITHUB_OUTPUT
+          
+          # Terraform plan -detailed-exitcode returns:
+          # 0 = Succeeded, diff is empty (no changes)
+          # 1 = Errored
+          # 2 = Succeeded, there is a diff
+          if [ $exitcode -eq 1 ]; then
+            exit 1
+          fi
+          terraform show -no-color $PWD/tfplan > $PWD/tfplan.txt
+
+      - name: Archive plan artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ inputs.layer }}
+          path: |
+            ${{ steps.workdir.outputs.dir }}/tfplan
+            ${{ steps.workdir.outputs.dir }}/tfplan.txt

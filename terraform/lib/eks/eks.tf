@@ -10,6 +10,9 @@ module "eks_cluster" {
   cluster_version                = var.cluster_version
   cluster_endpoint_public_access = true
 
+  manage_aws_auth_configmap = true
+  create_aws_auth_configmap = true
+
   cluster_addons = {
     vpc-cni = {
       before_compute = true

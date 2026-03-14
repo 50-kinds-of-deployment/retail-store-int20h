@@ -1,0 +1,57 @@
+name: Terraform Apply
+
+on:
+  workflow_call:
+    inputs:
+      layer:
+        description: 'Layer name to apply (bootstrap, ops, app)'
+        required: true
+        type: string
+
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    environment: stage
+    defaults:
+      run:
+        working-directory: ./terraform/layers/${{ inputs.layer }}
+    env:
+      TF_IN_AUTOMATION: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Set working directory
+        id: workdir
+        run: |
+          if [ "${{ inputs.layer }}" == "app" ]; then
+            echo "dir=./terraform/layers/app" >> $GITHUB_OUTPUT
+          else
+            echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+          fi
+        working-directory: .
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-${{ inputs.layer }}
+          path: ${{ steps.workdir.outputs.dir }}
+
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: ${{ steps.workdir.outputs.dir }}
+
+      - name: Terraform Apply
+        run: terraform apply -input=false $PWD/tfplan
+        working-directory: ${{ steps.workdir.outputs.dir }}
