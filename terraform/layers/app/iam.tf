@@ -9,3 +9,16 @@ module "iam_assumable_role_carts" {
 
   tags = local.tags
 }
+
+module "iam_assumable_role_external_secrets" {
+  source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version                       = "~> 5.58.0"
+  create_role                   = true
+  role_name                     = "${var.environment_name}-external-secrets"
+  provider_url                  = local.ops_outputs.eks_oidc_issuer_url
+  role_policy_arns              = [local.ops_outputs.external_secrets_policy_arn]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:external-secrets:external-secrets"]
+
+  tags = local.tags
+}
+

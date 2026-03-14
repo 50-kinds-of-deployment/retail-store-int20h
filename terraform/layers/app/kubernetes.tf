@@ -145,3 +145,24 @@ resource "null_resource" "restart_pods" {
     EOT
   }
 }
+
+resource "kubernetes_namespace_v1" "external_secrets" {
+  depends_on = [
+    data.kubernetes_nodes.vpc_ready_nodes
+  ]
+
+  metadata {
+    name = "external-secrets"
+  }
+}
+
+resource "kubernetes_service_account" "external_secrets" {
+  metadata {
+    name      = "external-secrets"
+    namespace = kubernetes_namespace_v1.external_secrets.metadata[0].name
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.iam_assumable_role_external_secrets.iam_role_arn
+    }
+  }
+}
+

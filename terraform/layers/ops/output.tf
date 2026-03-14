@@ -77,3 +77,5 @@ output "orders_sg_id" { value = aws_security_group.orders.id }
 output "catalog_db_secret_arn" { value = module.dependencies.catalog_db_secret_arn }
 output "orders_db_secret_arn" { value = module.dependencies.orders_db_secret_arn }
 output "mq_secret_arn" { value = module.dependencies.mq_secret_arn }
+
+output "external_secrets_policy_arn" { value = module.dependencies.external_secrets_policy_arn }
