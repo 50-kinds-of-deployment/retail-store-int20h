@@ -2,6 +2,12 @@ locals {
   security_groups_active = !var.opentelemetry_enabled
 }
 
+resource "aws_s3_bucket" "retail_store_bucket" {
+  bucket = "retail-store-bucket-terraform-s3"
+
+  object_lock_enabled = true
+}
+
 module "tags" {
   source = "../../lib/tags"
 
