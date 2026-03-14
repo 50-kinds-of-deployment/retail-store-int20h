@@ -23,6 +23,15 @@ jobs:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: semgrep scan --config=auto --exclude=*.lock --sarif --sarif-output=semgrep-results.sarif
 
+      - name: Check for findings
+        run: |
+          findings=$(jq '.runs[0].results | length' semgrep-results.sarif)
+          echo "Findings: $findings"
+          if [ "$findings" -gt 0 ]; then
+            echo "Findings detected, CI will fail after completing all steps"
+            echo "FAIL_CI=true" >> $GITHUB_ENV
+          fi
+
       - name: Generate HTML report
         run: |
           python3 scripts/sarif_to_html.py semgrep-results.sarif semgrep-report.html
@@ -32,6 +41,28 @@ jobs:
         with:
           name: semgrep-html-report
           path: semgrep-report.html
+
+      - name: "Get AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-central-1
+          role-session-name: SemgrepReportUpload
+
+      - name: Upload semgrep report to S3
+        run: aws s3 cp semgrep-report.html s3://${{ secrets.AWS_S3_REPORTS_BUCKET }}/semgrep-report-pr${{ github.event.pull_request.number }}.html
+
+      - name: Generate presigned URL
+        run: |
+          url=$(aws s3 presign s3://${{ secrets.AWS_S3_REPORTS_BUCKET }}/semgrep-report-pr${{ github.event.pull_request.number }}.html --expires-in 604800)
+          echo "PRESIGNED_URL=$url" >> $GITHUB_ENV
+
+      - name: Output report URL
+        run: echo "Semgrep HTML report available at: $PRESIGNED_URL"
+
+      - name: Fail CI if findings exist
+        if: env.FAIL_CI == 'true'
+        run: exit 1
 
       # only public repo
       # - name: Upload SARIF result to the GitHub Security Dashboard
