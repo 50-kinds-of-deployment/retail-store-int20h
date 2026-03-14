@@ -1,0 +1,21 @@
+name: Destroy EKS Cluster
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to destroy (dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+jobs:
+  destroy:
+    uses: ./.github/workflows/terraform-destroy.yml
+    with:
+      environment: ${{ inputs.environment }}
+    secrets: inherit

@@ -1,75 +1,75 @@
 output "catalog_db_endpoint" {
   description = "Writer endpoint for the catalog database"
-  value       = module.catalog_rds.cluster_endpoint
+  value       = module.catalog_rds.db_instance_endpoint
 }
 
 output "catalog_db_database_name" {
   description = "Database name for the catalog database"
-  value       = module.catalog_rds.cluster_database_name
+  value       = "catalog"
 }
 
 output "catalog_db_master_password" {
   description = "Master password for the catalog database"
-  value       = module.catalog_rds.cluster_master_password
+  value       = random_string.catalog_db_master.result
   sensitive   = true
 }
 
 output "catalog_db_master_username" {
   description = "Master username for the catalog database"
-  value       = module.catalog_rds.cluster_master_username
+  value       = "catalyst"
   sensitive   = true
 }
 
 output "catalog_db_port" {
   description = "Port for the catalog database"
-  value       = module.catalog_rds.cluster_port
+  value       = module.catalog_rds.db_instance_port
 }
 
 output "catalog_db_reader_endpoint" {
   description = "A read-only endpoint for the catalog database"
-  value       = module.catalog_rds.cluster_reader_endpoint
+  value       = module.catalog_rds.db_instance_endpoint
 }
 
 output "catalog_db_arn" {
   description = "ARN for the catalog database"
-  value       = module.catalog_rds.cluster_arn
+  value       = module.catalog_rds.db_instance_arn
 }
 
 output "orders_db_endpoint" {
   description = "Writer endpoint for the orders database"
-  value       = module.orders_rds.cluster_endpoint
+  value       = module.orders_rds.db_instance_endpoint
 }
 
 output "orders_db_database_name" {
   description = "Database name for the orders database"
-  value       = module.orders_rds.cluster_database_name
+  value       = "orders"
 }
 
 output "orders_db_master_password" {
   description = "Master password for the orders database"
-  value       = module.orders_rds.cluster_master_password
+  value       = random_string.orders_db_master.result
   sensitive   = true
 }
 
 output "orders_db_master_username" {
   description = "Master username for the orders database"
-  value       = module.orders_rds.cluster_master_username
+  value       = "postgres"
   sensitive   = true
 }
 
 output "orders_db_port" {
   description = "Port for the orders database"
-  value       = module.orders_rds.cluster_port
+  value       = module.orders_rds.db_instance_port
 }
 
 output "orders_db_reader_endpoint" {
   description = "Read-only endpoint for the orders database"
-  value       = module.orders_rds.cluster_reader_endpoint
+  value       = module.orders_rds.db_instance_endpoint
 }
 
 output "orders_db_arn" {
   description = "ARN for the orders database"
-  value       = module.orders_rds.cluster_arn
+  value       = module.orders_rds.db_instance_arn
 }
 
 output "carts_dynamodb_table_arn" {

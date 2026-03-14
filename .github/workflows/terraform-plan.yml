@@ -1,0 +1,75 @@
+name: Terraform Plan
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+env:
+  TERRAFORM_VERSION: 1.9.0
+  AWS_DEFAULT_REGION: us-west-2
+  TERRAFORM_DIR: terraform/eks/default
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        run: |
+          cd ${{ env.TERRAFORM_DIR }}
+          terraform init -upgrade
+        env:
+          TF_IN_AUTOMATION: true
+
+      - name: Terraform Validate
+        run: |
+          cd ${{ env.TERRAFORM_DIR }}
+          terraform validate
+
+      - name: Terraform Format Check
+        run: |
+          cd ${{ env.TERRAFORM_DIR }}
+          terraform fmt -check -recursive
+
+      - name: Terraform Plan
+        run: |
+          cd ${{ env.TERRAFORM_DIR }}
+          terraform plan -out=tfplan -input=false \
+            -var="environment_name=${{ inputs.environment }}-retail-store" \
+            -lock=false
+        env:
+          TF_IN_AUTOMATION: true
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ inputs.environment }}-${{ github.run_id }}
+          path: ${{ env.TERRAFORM_DIR }}/tfplan
+          retention-days: 5
