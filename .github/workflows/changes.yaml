@@ -22,7 +22,7 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: changes
         with:
-          base: ci/buildah #TODO change later to main
+          base: main
           filters: |
               ui:
                 - 'src/ui/**'

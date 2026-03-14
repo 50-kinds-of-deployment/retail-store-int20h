@@ -1,8 +1,8 @@
-name: Build services
+name: Build services on main
 on:
   push:
     branches:
-      - "ci/buildah" #TODO change later to main
+      - "main"
 
 jobs:
   changes:
