@@ -146,13 +146,15 @@ resource "null_resource" "restart_pods" {
   }
 }
 
-resource "kubernetes_service_account" "external_secrets" {
+resource "kubernetes_annotations" "external_secrets_irsa" {
+  api_version = "v1"
+  kind        = "ServiceAccount"
   metadata {
     name      = "external-secrets"
-    namespace = kubernetes_namespace_v1.external_secrets.metadata[0].name
-    annotations = {
-      "eks.amazonaws.com/role-arn" = module.iam_assumable_role_external_secrets.iam_role_arn
-    }
+    namespace = "external-secrets"
+  }
+  annotations = {
+    "eks.amazonaws.com/role-arn" = module.iam_assumable_role_external_secrets.iam_role_arn
   }
 }
 
