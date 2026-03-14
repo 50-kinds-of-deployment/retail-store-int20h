@@ -86,6 +86,14 @@ resource "aws_security_group" "catalog" {
     cidr_blocks = [module.vpc.inner.vpc_cidr_block]
   }
 
+  ingress {
+    description = "Allow inbound MySQL traffic"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc.inner.vpc_cidr_block]
+  }
+
   egress {
     description = "Allow all egress"
     from_port   = 0
@@ -114,6 +122,14 @@ resource "aws_security_group" "orders" {
     description = "Allow inbound Istio healthchecks"
     from_port   = 15020
     to_port     = 15021
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc.inner.vpc_cidr_block]
+  }
+
+  ingress {
+    description = "Allow inbound PostgreSQL traffic"
+    from_port   = 5432
+    to_port     = 5432
     protocol    = "tcp"
     cidr_blocks = [module.vpc.inner.vpc_cidr_block]
   }
