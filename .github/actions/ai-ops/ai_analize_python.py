@@ -187,13 +187,18 @@ def infer_source_filename(test_filename):
 
 def main():
     changed_files = get_changed_files()
+    review_comments = []
+    
     for file in changed_files:
         filename = file["filename"]
         diff_hunk = file["patch"]
-        position = file["changes"]  # Simplification: using changes as line number
         comment = generate_review_comment(diff_hunk, filename)
         if comment:
-            post_inline_comment(comment, filename, position)
+            review_comments.append(f"**{filename}**\n{comment}")
+    
+    if review_comments:
+        full_comment = "\n\n---\n\n".join(review_comments)
+        post_pr_comment(f"## AI Code Review\n\n{full_comment}")
 
 if __name__ == "__main__":
     main()
