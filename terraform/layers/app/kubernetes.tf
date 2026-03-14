@@ -186,7 +186,6 @@ resource "kubernetes_namespace_v1" "ui" {
 resource "helm_release" "ui" {
   depends_on = [
     helm_release.catalog,
-    helm_release.carts,
     helm_release.checkout,
     helm_release.orders
   ]
