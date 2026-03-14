@@ -40,7 +40,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-central-1
-          
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
@@ -67,13 +67,20 @@ jobs:
         if: ${{ !inputs.skip-sentinel }}
         working-directory: ${{ steps.workdir.outputs.dir }}
         run: |
-          if [ -f "sentinel.hcl" ]; then
+          if [ -f "sentinel.json" ]; then
             echo "Running Sentinel policy checks..."
             # Convert tfplan to JSON for Sentinel
             terraform show -json tfplan > tfplan.json
-            # Test the plan against Sentinel policies
-            sentinel apply -policy=sentinel.hcl tfplan.json || exit 1
-            echo "Sentinel policy checks passed"
+            
+            # Run Sentinel policy checks
+            sentinel apply sentinel.json
+            
+            if [ $? -eq 0 ]; then
+              echo "Sentinel policy checks passed"
+            else
+              echo "Sentinel policy checks failed"
+              exit 1
+            fi
           else
             echo "No Sentinel policy file found, skipping checks"
           fi

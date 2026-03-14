@@ -1,0 +1,13 @@
+{
+  "imports": {
+    "tfplan": {
+      "data": "tfplan.json"
+    }
+  },
+  "policies": [
+    {
+      "enforcement_level": "advisory",
+      "path": "bootstrap.sentinel"
+    }
+  ]
+}
