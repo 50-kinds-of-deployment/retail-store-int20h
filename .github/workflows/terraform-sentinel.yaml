@@ -53,6 +53,10 @@ jobs:
           name: terraform-plan-${{ inputs.layer }}
           path: ${{ steps.workdir.outputs.dir }}
 
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: ${{ steps.workdir.outputs.dir }}
+
       - name: Run Sentinel Policy Check
         if: ${{ !inputs.skip-sentinel }}
         working-directory: ${{ steps.workdir.outputs.dir }}
