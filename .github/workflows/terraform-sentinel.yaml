@@ -64,7 +64,7 @@ jobs:
         working-directory: ${{ steps.workdir.outputs.dir }}
 
       - name: Run Sentinel Policy Check
-        if: ${{ !inputs.skip-sentinel }}
+        if: ${{ inputs.skip-sentinel == false }}
         working-directory: ${{ steps.workdir.outputs.dir }}
         run: |
           if [ -f "sentinel.json" ]; then
