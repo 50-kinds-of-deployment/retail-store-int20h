@@ -67,18 +67,15 @@ jobs:
         if: ${{ inputs.skip-sentinel == false }}
         working-directory: ${{ steps.workdir.outputs.dir }}
         run: |
-          if [ -f "sentinel.json" ]; then
-            echo "Running Sentinel policy checks..."
+          CONFIG_FILE="sentinel.hcl"
+          if [ ! -f "$CONFIG_FILE" ]; then
+            CONFIG_FILE="sentinel.json"
+          fi
+
+          if [ -f "$CONFIG_FILE" ]; then
+            echo "Running Sentinel policy checks with $CONFIG_FILE..."
             
             # Convert tfplan to JSON for Sentinel
-            # Wrap tfplan.json content in a root object to match Sentinel tfplan/v2 expectation
-            terraform show -json tfplan > raw_tfplan.json
-            echo '{"terraform_version": "1.0.0", "format_version": "0.1"}' > tfplan.json
-            cat raw_tfplan.json >> tfplan.json
-            
-            # Actually, Sentinel expects the tfplan/v2 mock to be just the JSON output of terraform show -json.
-            # However, some versions of the CLI are picky about the structure.
-            # Let's ensure tfplan.json is exactly the output of terraform show -json.
             terraform show -json tfplan > tfplan.json
             
             # Determine policy file name based on layer
@@ -86,18 +83,15 @@ jobs:
             POLICY_FILE="${LAYER}.sentinel"
             
             if [ -f "$POLICY_FILE" ]; then
-              # Run Sentinel with config file
-              sentinel apply -config=sentinel.json "$POLICY_FILE"
-              
-              if [ $? -eq 0 ]; then
-                echo "Sentinel policy checks passed"
-              else
+              # Run Sentinel apply. If it fails, the workflow will exit with 1.
+              if ! sentinel apply -config="$CONFIG_FILE"; then
                 echo "Sentinel policy checks failed"
                 exit 1
               fi
+              echo "Sentinel policy checks passed"
             else
               echo "No policy file found ($POLICY_FILE), skipping checks"
             fi
           else
-            echo "No Sentinel configuration found (sentinel.json), skipping checks"
+            echo "No Sentinel configuration found (sentinel.hcl or sentinel.json), skipping checks"
           fi
