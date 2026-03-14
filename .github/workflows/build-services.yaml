@@ -1,4 +1,4 @@
-name: Build relayer-svc docker image
+name: Build services
 on:
   push:
     branches:
