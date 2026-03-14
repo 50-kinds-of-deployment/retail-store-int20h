@@ -30,3 +30,10 @@ variable "container_image_overrides" {
   default     = {}
   description = "Object that encapsulates any overrides to default values"
 }
+
+variable "argocd_github_token" {
+  description = "GitHub token for ArgoCD repository access"
+  type        = string
+  sensitive   = true
+  default     = ""
+}

@@ -22,6 +22,7 @@ jobs:
         working-directory: ./terraform/layers/${{ inputs.layer }}
     env:
       TF_IN_AUTOMATION: true
+      TF_VAR_argocd_github_token: ${{ secrets.ARGOCD_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
