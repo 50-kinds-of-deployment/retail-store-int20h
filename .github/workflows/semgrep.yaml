@@ -47,7 +47,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-central-1
+          aws-region: eu-central-1
           role-session-name: SemgrepReportUpload
 
       - name: Upload semgrep report to S3
