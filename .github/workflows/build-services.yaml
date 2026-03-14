@@ -12,10 +12,9 @@ jobs:
     name: Build
     needs: changes
     if: needs.changes.outputs.has_changes == 'true'
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJson(needs.changes.outputs.matrix) }}    
     runs-on: ubuntu-24.04
+    strategy:
+      matrix: ${{ fromJson(needs.changes.outputs.matrix) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
