@@ -1,0 +1,54 @@
+name: Destroy Infrastructure
+run-name: Destroy ${{ inputs.layer }} layer
+
+on:
+  workflow_dispatch:
+    inputs:
+
+      layer:
+        description: 'Layer to destroy'
+        required: true
+        default: 'app'
+        type: choice
+        options:
+          - app
+          - ops
+          - bootstrap
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  destroy:
+    runs-on: ubuntu-24.04
+    env:
+      TF_IN_AUTOMATION: true
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Set working directory
+        id: workdir
+        run: |
+          if [ "${{ inputs.layer }}" == "app" ]; then
+            echo "dir=./terraform/layers/app" >> $GITHUB_OUTPUT
+          else
+            echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: ${{ steps.workdir.outputs.dir }}
+
+      - name: Terraform Destroy
+        working-directory: ${{ steps.workdir.outputs.dir }}
+        run: |
+          terraform destroy -auto-approve -input=false

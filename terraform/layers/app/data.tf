@@ -1,16 +1,20 @@
 data "terraform_remote_state" "ops" {
-  backend = "local"
+  backend = "s3"
 
   config = {
-    path = "../ops/terraform.tfstate"
+    bucket = "retail-store-tf-state-eu-central-1"
+    key    = "stage/ops/terraform.tfstate"
+    region = "eu-central-1"
   }
 }
 
 data "terraform_remote_state" "bootstrap" {
-  backend = "local"
+  backend = "s3"
 
   config = {
-    path = "../bootstrap/terraform.tfstate"
+    bucket = "retail-store-tf-state-eu-central-1"
+    key    = "stage/bootstrap/terraform.tfstate"
+    region = "eu-central-1"
   }
 }
 

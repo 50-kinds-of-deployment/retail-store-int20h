@@ -1,0 +1,47 @@
+name: Deploy
+run-name: Deploy infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      layer:
+        description: 'Layer name to deploy'
+        required: true
+        type: choice
+        default: "all"
+        options:
+          - bootstrap
+          - ops
+          - app
+          - all
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  bootstrap:
+    name: Deploy bootstrap layer
+    if: ${{ inputs.layer == 'bootstrap' || inputs.layer == 'all' }}
+    uses: ./.github/workflows/cd.yaml
+    secrets: inherit
+    with:
+      layer: bootstrap
+
+  ops:
+    name: Deploy ops layer
+    needs: [bootstrap]
+    if: ${{ always() && !failure() && !cancelled() && (inputs.layer == 'ops' || inputs.layer == 'all') }}
+    uses: ./.github/workflows/cd.yaml
+    secrets: inherit
+    with:
+      layer: ops
+
+  app:
+    name: Deploy app layer
+    needs: [ops]
+    if: ${{ always() && !failure() && !cancelled() && (inputs.layer == 'app' || inputs.layer == 'all') }}
+    uses: ./.github/workflows/cd.yaml
+    secrets: inherit
+    with:
+      layer: app

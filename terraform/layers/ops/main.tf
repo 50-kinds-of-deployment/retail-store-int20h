@@ -1,8 +1,10 @@
 data "terraform_remote_state" "bootstrap" {
-  backend = "local"
+  backend = "s3"
 
   config = {
-    path = "../bootstrap/terraform.tfstate"
+    bucket = "retail-store-tf-state-eu-central-1"
+    key    = "stage/bootstrap/terraform.tfstate"
+    region = "eu-central-1"
   }
 }
 
@@ -12,7 +14,7 @@ locals {
 }
 
 module "vpc" {
-  source = "../../../lib/vpc"
+  source = "../../lib/vpc"
 
   environment_name = var.environment_name
 
@@ -30,7 +32,7 @@ module "vpc" {
 }
 
 module "retail_app_eks" {
-  source = "../../../lib/eks"
+  source = "../../lib/eks"
 
   providers = {
     kubernetes.cluster = kubernetes
@@ -50,7 +52,7 @@ module "retail_app_eks" {
 }
 
 module "dependencies" {
-  source = "../../../lib/dependencies"
+  source = "../../lib/dependencies"
 
   environment_name = var.environment_name
   tags             = local.tags
