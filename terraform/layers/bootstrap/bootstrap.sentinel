@@ -23,7 +23,7 @@ mandatory_tags_present = rule {
     }
 }
 
-# Main rule
+# Main rule - Hard mandatory enforcement
 main = rule {
     mandatory_tags_present
 }
