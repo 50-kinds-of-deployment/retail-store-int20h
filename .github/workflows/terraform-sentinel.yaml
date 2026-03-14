@@ -1,0 +1,63 @@
+name: Terraform Sentinel Policy Check
+
+on:
+  workflow_call:
+    inputs:
+      layer:
+        description: 'Layer name to analyze (bootstrap, ops, app)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  sentinel:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./terraform/layers/${{ inputs.layer }}
+    env:
+      TF_IN_AUTOMATION: true
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set working directory for layer
+        id: workdir
+        run: |
+          echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+        working-directory: .
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Install Sentinel
+        run: |
+          wget https://releases.hashicorp.com/sentinel/0.40.0/sentinel_0.40.0_linux_amd64.zip
+          unzip sentinel_0.40.0_linux_amd64.zip
+          sudo mv sentinel /usr/local/bin/
+          rm sentinel_0.40.0_linux_amd64.zip
+          sentinel version
+
+      - name: Download plan artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-${{ inputs.layer }}
+          path: ${{ steps.workdir.outputs.dir }}
+
+      - name: Run Sentinel Policy Check
+        working-directory: ${{ steps.workdir.outputs.dir }}
+        run: |
+          if [ -f "sentinel.hcl" ]; then
+            echo "Running Sentinel policy checks..."
+            # Convert tfplan to JSON for Sentinel
+            terraform show -json tfplan > tfplan.json
+            # Test the plan against Sentinel policies
+            sentinel apply -policy=sentinel.hcl tfplan.json || exit 1
+            echo "Sentinel policy checks passed"
+          else
+            echo "No Sentinel policy file found, skipping checks"
+          fi
