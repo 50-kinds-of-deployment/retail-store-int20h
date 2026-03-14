@@ -1,5 +1,8 @@
 import "tfplan/v2" as tfplan
 
+# Debugging information
+print("Analyzing resource changes...")
+
 # Define required tags
 required_tags = ["Environment", "Owner", "Project", "ManagedBy"]
 
@@ -16,6 +19,8 @@ managed_resources = filter resource_changes as address, rc {
 mandatory_tags_present = rule {
     all managed_resources as address, rc {
         all required_tags as t {
+            (print("Checking resource:", address) or true) and
+            (print("Tags found:", rc.change.after.tags) or true) and
             rc.change.after.tags is not null and
             t in rc.change.after.tags and
             length(rc.change.after.tags[t]) > 0
@@ -23,9 +28,14 @@ mandatory_tags_present = rule {
     }
 }
 
+# Ensure at least one resource is found and checked
+resources_checked = rule {
+    length(managed_resources) > 0
+}
+
 # Main rule - Hard mandatory enforcement
 main = rule {
-    mandatory_tags_present
+    resources_checked and mandatory_tags_present
 }
 
 
