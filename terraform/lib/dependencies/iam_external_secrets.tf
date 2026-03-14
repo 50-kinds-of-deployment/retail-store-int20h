@@ -12,7 +12,8 @@ resource "aws_iam_policy" "external_secrets" {
         Resource = [
           aws_secretsmanager_secret.catalog_db_credentials.arn,
           aws_secretsmanager_secret.orders_db_credentials.arn,
-          aws_secretsmanager_secret.mq_credentials.arn
+          aws_secretsmanager_secret.mq_credentials.arn,
+          aws_secretsmanager_secret.checkout_redis_credentials.arn
         ]
       }
     ]

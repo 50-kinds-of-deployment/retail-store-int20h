@@ -43,6 +43,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "checkout.configMapName" . }}
+            {{- if .Values.app.persistence.secret.name }}
+            - secretRef:
+                name: {{ .Values.app.persistence.secret.name }}
+            {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.Version }}"

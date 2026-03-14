@@ -147,3 +147,8 @@ output "mq_secret_arn" {
   value       = aws_secretsmanager_secret.mq_credentials.arn
   description = "ARN of the AWS Secrets Manager secret for RabbitMQ credentials"
 }
+
+output "checkout_redis_secret_arn" {
+  value       = aws_secretsmanager_secret.checkout_redis_credentials.arn
+  description = "ARN of the AWS Secrets Manager secret for Checkout Redis credentials"
+}

@@ -9,8 +9,10 @@ opentelemetry:
 app:
   persistence:
     provider: 'redis'
+    secret:
+      name: 'checkout-redis'
     redis:
-      endpoint: 'stage-retail-store-checkout.q8y28x.ng.0001.euc1.cache.amazonaws.com:6379'
+      endpoint: ''
 
   endpoints:
     orders: 'http://orders.orders.svc:80'

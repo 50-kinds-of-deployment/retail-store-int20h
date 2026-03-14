@@ -79,3 +79,4 @@ output "orders_db_secret_arn" { value = module.dependencies.orders_db_secret_arn
 output "mq_secret_arn" { value = module.dependencies.mq_secret_arn }
 
 output "external_secrets_policy_arn" { value = module.dependencies.external_secrets_policy_arn }
+output "checkout_redis_secret_arn" { value = module.dependencies.checkout_redis_secret_arn }
