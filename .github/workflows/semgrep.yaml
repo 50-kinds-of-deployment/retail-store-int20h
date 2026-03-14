@@ -1,0 +1,72 @@
+name: Semgrep
+
+on:
+  pull_request: {}
+
+jobs:
+  semgrep_scan:
+    name: semgrep/ci
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    permissions:
+      id-token: write    
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install AWS CLI
+        run: apk add --no-cache aws-cli
+
+      - name: Perform Semgrep Analysis
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: semgrep scan --config=auto --exclude=*.lock --sarif --sarif-output=semgrep-results.sarif
+
+      - name: Check for findings
+        run: |
+          findings=$(jq '.runs[0].results | length' semgrep-results.sarif)
+          echo "Findings: $findings"
+          if [ "$findings" -gt 0 ]; then
+            echo "Findings detected, CI will fail after completing all steps"
+            echo "FAIL_CI=true" >> $GITHUB_ENV
+          fi
+
+      - name: Generate HTML report
+        run: |
+          python3 scripts/sarif_to_html.py semgrep-results.sarif semgrep-report.html
+
+      - name: Save HTML report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-html-report
+          path: semgrep-report.html
+
+      - name: "Get AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          role-session-name: SemgrepReportUpload
+
+      - name: Upload semgrep report to S3
+        env:
+          AWS_S3_REPORTS_BUCKET: retail-store-reports-bucket
+        run: |
+          aws s3 cp semgrep-report.html s3://$AWS_S3_REPORTS_BUCKET/semgrep-report-pr${{ github.event.number }}.html
+          echo "Semgrep HTML report available at: https://$AWS_S3_REPORTS_BUCKET.s3.amazonaws.com/semgrep-report-pr${{ github.event.number }}.html"
+
+
+      - name: Fail CI if findings exist
+        if: env.FAIL_CI == 'true'
+        run: exit 1
+
+      # only public repo
+      # - name: Upload SARIF result to the GitHub Security Dashboard
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: semgrep-results.sarif
+      #   if: always()
