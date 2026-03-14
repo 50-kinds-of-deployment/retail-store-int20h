@@ -10,6 +10,7 @@ RATE_LIMIT_PERIOD = 60  # seconds
 MIN_REQUEST_INTERVAL = RATE_LIMIT_PERIOD / RATE_LIMIT_REQUESTS  # 2 seconds
 
 last_request_time = 0
+errors_occurred = False
 
 def rate_limit():
     """Enforce rate limiting - max 30 requests per minute."""
@@ -48,12 +49,14 @@ HEADERS = {
 
 
 def get_changed_files():
+    global errors_occurred
     rate_limit()
     url = f"https://api.github.com/repos/{REPO}/pulls/{PR_NUMBER}/files"
     print(f"[INFO] Fetching changed files from: {url}")
     response = requests.get(url, headers=HEADERS)
     if response.status_code != 200:
         print(f"[ERROR] GitHub API error {response.status_code}: {response.text}")
+        errors_occurred = True
         return []
     return response.json()
 
@@ -73,6 +76,7 @@ def clean_gemini_comment(comment):
     return comment
 
 def generate_review_comment(diff_hunk, filename):
+    global errors_occurred
     prompt = f"""
 You're a senior DevOps reviewer. Carefully review this code diff from `{filename}`.
 
@@ -95,15 +99,18 @@ Diff:
         comment = response.text
     except Exception as e:
         print(f"[ERROR] Gemma API error: {e}")
+        errors_occurred = True
         return ""
     return clean_gemini_comment(comment)
 
 def get_latest_commit_sha():
+    global errors_occurred
     rate_limit()
     url = f"https://api.github.com/repos/{REPO}/pulls/{PR_NUMBER}"
     response = requests.get(url, headers=HEADERS)
     if response.status_code != 200:
         print(f"[ERROR] GitHub API error {response.status_code}: {response.text}")
+        errors_occurred = True
         return None
     return response.json()["head"]["sha"]
 
@@ -162,17 +169,25 @@ Test file: {test_filename}
     return clean_gemini_comment(comment)
 
 def post_pr_comment(body):
+    global errors_occurred
     rate_limit()
     url = f"https://api.github.com/repos/{REPO}/issues/{PR_NUMBER}/comments"
     data = {"body": body}
     response = requests.post(url, headers=HEADERS, data=json.dumps(data))
     if response.status_code != 201:
         print(f"[ERROR] Failed to post PR comment: {response.status_code} {response.text}")
+        errors_occurred = True
     else:
         print(f"[INFO] Posted PR comment")
 
 def main():
+    global errors_occurred
     changed_files = get_changed_files()
+    
+    if errors_occurred:
+        print("[ERROR] Failed to fetch changed files")
+        return 1
+    
     review_comments = []
     
     for file in changed_files:
@@ -185,6 +200,13 @@ def main():
     if review_comments:
         full_comment = "\n\n---\n\n".join(review_comments)
         post_pr_comment(f"## AI Code Review\n\n{full_comment}")
+    
+    if errors_occurred:
+        print("[ERROR] One or more errors occurred during execution")
+        return 1
+    
+    return 0
 
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    sys.exit(exit_code)
