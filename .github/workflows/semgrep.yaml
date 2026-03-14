@@ -20,7 +20,7 @@ jobs:
       - name: Perform Semgrep Analysis
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: semgrep scan --config=auto -q --sarif ./src > semgrep-results.sarif
+        run: semgrep --config=auto --sarif src --sarif-output=semgrep-results.sarif
 
       - name: Generate HTML report
         run: |
