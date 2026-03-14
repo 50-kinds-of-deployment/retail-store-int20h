@@ -1,0 +1,44 @@
+name: Build relayer-svc docker image
+on:
+  push:
+    branches:
+      - "ci/buildah"
+
+jobs:
+  changes:
+    uses: ./.github/workflows/changes.yaml
+
+  build:
+    name: Build
+    needs: changes
+    if: needs.changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.changes.outputs.matrix) }}    
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Build and Push Image
+        env:
+          IMAGE: ${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+          CACHE_REPO: ${{ github.repository }}/${{ matrix.service }}/cache
+        run: |
+          buildah build \
+            -f src/${{ matrix.service }}/Dockerfile \
+            --layers \
+            --cache-from $CACHE_REPO \
+            --cache-to $CACHE_REPO \
+            -t $IMAGE \
+            .
+
+      - name: Push Image
+        env:
+          IMAGE: ${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+        run: buildah push $IMAGE

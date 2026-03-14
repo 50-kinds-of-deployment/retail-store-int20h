@@ -1,0 +1,80 @@
+name: Detect Changed Services
+
+on:
+  workflow_call:
+    outputs:
+      matrix:
+        value: ${{ jobs.changes.outputs.matrix }}
+      has_changes:
+        value: ${{ jobs.changes.outputs.has_changes }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+              ui:
+                - 'src/ui/**'
+              catalog:
+                - 'src/catalog/**'
+              cart:
+                - 'src/cart/**'
+              orders:
+                - 'src/currencyservice/**'
+              checkout:
+                - 'src/checkout/**'
+
+
+      - name: Build changed services matrix
+        id: set-matrix
+        env:
+          UI: ${{ steps.changes.outputs.ui }}
+          CATALOG: ${{ steps.changes.outputs.cart }}
+          CART: ${{ steps.changes.outputs.cart }}
+          ORDERS: ${{ steps.changes.outputs.orders }}
+          CHECKOUT: ${{ steps.changes.outputs.checkout }}
+
+        run: |
+          SERVICES=()
+          declare -A SERVICE_MAP=(
+            [UI]=ui
+            [CATALOG]=catalog
+            [CART]=cart
+            [ORDERS]=orders
+            [CHECKOUT]=checkout
+          )
+
+          for env_var in "${!SERVICE_MAP[@]}"; do
+            if [ "${!env_var}" == "true" ]; then
+              SERVICES+=("\"${SERVICE_MAP[$env_var]}\"")
+            fi
+          done
+
+          if [ ${#SERVICES[@]} -eq 0 ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "matrix={}" >> $GITHUB_OUTPUT
+          else
+            MATRIX=$(IFS=,; echo "${SERVICES[*]}")
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "matrix={\"service\":[$MATRIX]}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create matrix file
+        run: echo '${{ steps.set-matrix.outputs.matrix }}' > changed_services.json
+
+      - name: Upload matrix artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: service-matrix
+          path: changed_services.json
+          retention-days: 1
