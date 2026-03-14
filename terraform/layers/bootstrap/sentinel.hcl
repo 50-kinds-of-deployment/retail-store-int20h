@@ -5,6 +5,6 @@ mock "tfplan/v2" {
 }
 
 policy "bootstrap" {
-  source            = "bootstrap.sentinel"
+  source            = "./bootstrap.sentinel"
   enforcement_level = "hard-mandatory"
 }
