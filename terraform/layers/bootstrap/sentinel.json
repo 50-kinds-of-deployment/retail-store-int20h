@@ -1,6 +1,8 @@
 {
   "mock": {
-    "tfplan/v2": "tfplan.json"
+    "tfplan/v2": {
+      "module": "tfplan.json"
+    }
   },
   "policies": [
     {
