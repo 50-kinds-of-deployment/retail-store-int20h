@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/50-kinds-of-deployment/retail-store-int20h.git
-    targetRevision: argocd
+    targetRevision: main
     path: argocd/apps   
   destination:
     server: https://kubernetes.default.svc
