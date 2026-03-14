@@ -74,11 +74,11 @@ def clean_gemini_comment(comment):
 
 def generate_review_comment(diff_hunk, filename):
     prompt = f"""
-You're a senior Android reviewer. Carefully review this code diff from `{filename}`.
+You're a senior DevOps reviewer. Carefully review this code diff from `{filename}`.
 
 - Only return specific, actionable, and concise inline review comments.
 - Use clear markdown formatting for code, lists, or warnings.
-- Avoid generic feedback. Focus on deprecated APIs, performance, testability, and Android best practices.
+- Avoid generic feedback. Focus on deprecated APIs, performance, testability, and DevOps best practices.
 - Each comment should be suitable for direct posting as a GitHub inline review.
 - If the diff is fine, return a short positive note.
 
@@ -137,7 +137,7 @@ def fetch_file_content(repo, path):
 
 def generate_test_coverage_comment(source_code, test_code, source_filename, test_filename):
     prompt = f"""
-You're a senior Android reviewer. Compare the following source file and its test file. Give feedback on:
+You're a senior DevOps reviewer. Compare the following source file and its test file. Give feedback on:
 - Test coverage and missing test cases
 - Test quality (clarity, isolation, edge cases)
 - Suggestions to improve testability
@@ -170,20 +170,6 @@ def post_pr_comment(body):
         print(f"[ERROR] Failed to post PR comment: {response.status_code} {response.text}")
     else:
         print(f"[INFO] Posted PR comment")
-
-import re
-
-
-def infer_source_filename(test_filename):
-    if test_filename.endswith("Test.java"):
-        return test_filename.replace("Test.java", ".java")
-    if test_filename.endswith("Test.kt"):
-        return test_filename.replace("Test.kt", ".kt")
-    if test_filename.endswith("Test.py"):
-        return test_filename.replace("Test.py", ".py")
-    if test_filename.endswith("_test.py"):
-        return test_filename.replace("_test.py", ".py")
-    return test_filename
 
 def main():
     changed_files = get_changed_files()
