@@ -69,8 +69,6 @@ jobs:
         run: |
           if [ -f "sentinel.json" ]; then
             echo "Running Sentinel policy checks..."
-            # Convert tfplan to JSON for Sentinel
-            terraform show -json tfplan > tfplan.json
             
             # Determine policy file name based on layer
             LAYER="${{ inputs.layer }}"
