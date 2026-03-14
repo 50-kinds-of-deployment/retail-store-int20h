@@ -6,6 +6,12 @@ inputs:
     description: Python version to use
     required: false
     default: '3.11'
+  github-token:
+    description: GitHub token for API access
+    required: true
+  gemini-api-key:
+    description: API key for Gemini AI
+    required: true
 
 runs:
   using: composite
@@ -29,7 +35,7 @@ runs:
       run: python3 .github/actions/ai-ops/ai_analize_python.py
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_REF: ${{ github.ref }}
