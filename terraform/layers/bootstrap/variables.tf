@@ -1,7 +1,7 @@
 variable "environment_name" {
   type        = string
   description = "The name of the environment (e.g. retail-store)"
-  default     = "retail-store"
+  default     = "stage-retail-store"
 }
 
 variable "gh_oidc_sub" {

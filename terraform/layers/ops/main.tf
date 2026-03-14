@@ -35,9 +35,9 @@ module "retail_app_eks" {
   source = "../../lib/eks"
 
   providers = {
-    kubernetes.cluster = kubernetes
+    kubernetes.cluster = kubernetes.cluster
     kubernetes.addons  = kubernetes
-    helm               = helm
+    helm = helm
   }
 
   environment_name      = var.environment_name
