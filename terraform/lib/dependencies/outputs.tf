@@ -1,6 +1,6 @@
 output "catalog_db_endpoint" {
-  description = "Writer endpoint for the catalog database"
-  value       = module.catalog_rds.db_instance_endpoint
+  description = "Hostname (without port) for the catalog database"
+  value       = split(":", module.catalog_rds.db_instance_endpoint)[0]
 }
 
 output "catalog_db_database_name" {
@@ -26,8 +26,8 @@ output "catalog_db_port" {
 }
 
 output "catalog_db_reader_endpoint" {
-  description = "A read-only endpoint for the catalog database"
-  value       = module.catalog_rds.db_instance_endpoint
+  description = "Hostname (without port) for the catalog database (read-only)"
+  value       = split(":", module.catalog_rds.db_instance_endpoint)[0]
 }
 
 output "catalog_db_arn" {
@@ -36,8 +36,8 @@ output "catalog_db_arn" {
 }
 
 output "orders_db_endpoint" {
-  description = "Writer endpoint for the orders database"
-  value       = module.orders_rds.db_instance_endpoint
+  description = "Hostname (without port) for the orders database"
+  value       = split(":", module.orders_rds.db_instance_endpoint)[0]
 }
 
 output "orders_db_database_name" {
@@ -63,8 +63,8 @@ output "orders_db_port" {
 }
 
 output "orders_db_reader_endpoint" {
-  description = "Read-only endpoint for the orders database"
-  value       = module.orders_rds.db_instance_endpoint
+  description = "Hostname (without port) for the orders database (read-only)"
+  value       = split(":", module.orders_rds.db_instance_endpoint)[0]
 }
 
 output "orders_db_arn" {
