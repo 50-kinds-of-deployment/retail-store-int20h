@@ -8,7 +8,7 @@ USER node
 
 
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023
-
+# test build 1
 # We tell DNF not to install Recommends and Suggests packages, which are
 # weak dependencies in DNF terminology, thus keeping our installed set of
 # packages as minimal as possible.
@@ -34,7 +34,7 @@ RUN useradd \
 WORKDIR /app
 USER appuser
 
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+COPY --chown=1000:1000 --from=build /usr/src/app/node_modules ./node_modules
+COPY --chown=1000:1000 --from=build /usr/src/app/dist ./dist
 
 ENTRYPOINT [ "node", "dist/main.js" ]
