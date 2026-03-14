@@ -20,7 +20,7 @@ jobs:
       - name: Perform Semgrep Analysis
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: semgrep ci -q --sarif ./src > semgrep-results.sarif
+        run: semgrep ci -q --sarif > semgrep-results.sarif
 
       - name: Save SARIF results as artifact
         uses: actions/upload-artifact@v4
