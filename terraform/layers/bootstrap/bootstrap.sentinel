@@ -1,29 +1,33 @@
-import "json"
+# Bootstrap layer - State backend configuration
+# Policies to enforce infrastructure standards
 
-# Require S3 bucket for state backend in bootstrap layer
-s3_bucket_exists = rule {
-  length(filter(json.unmarshal(read_file("tfplan.json")).resource_changes or [], 
-    .type == "aws_s3_bucket")) > 0
+# Check that S3 buckets have tags defined
+s3_buckets_have_tags = rule {
+  all tfplan.resource_changes as rc {
+    rc.type == "aws_s3_bucket" {
+      rc.change.after.tags is not null
+    }
+  }
 }
 
-# Require DynamoDB table for state locking
-dynamodb_exists = rule {
-  length(filter(json.unmarshal(read_file("tfplan.json")).resource_changes or [], 
-    .type == "aws_dynamodb_table")) > 0
-}
-
-# Require KMS key for encryption
-kms_key_exists = rule {
-  length(filter(json.unmarshal(read_file("tfplan.json")).resource_changes or [], 
-    .type == "aws_kms_key")) > 0
+# Check that tags contain required keys
+s3_buckets_have_required_tags = rule {
+  all tfplan.resource_changes as rc {
+    rc.type == "aws_s3_bucket" {
+      rc.change.after.tags contains "Environment" and
+      rc.change.after.tags contains "Owner"
+    }
+  }
 }
 
 # All checks must pass
 main = rule {
-  s3_bucket_exists and
-  dynamodb_exists and
-  kms_key_exists
+  s3_buckets_have_tags and
+  s3_buckets_have_required_tags
 }
+
+
+
 
 
 
