@@ -26,7 +26,7 @@ runs:
       shell: bash
 
     - name: Run AI Review
-      run: python3 .github/scripts/ai_code_review.py
+      run: python3 .github/actions/ai-ops/ai_code_review.py
       shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
