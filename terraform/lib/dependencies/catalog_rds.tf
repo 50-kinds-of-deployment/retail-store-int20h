@@ -23,6 +23,9 @@ module "catalog_rds" {
   storage_encrypted      = true
   apply_immediately      = true
   skip_final_snapshot    = true
+  backup_retention_period = 1
+  preferred_backup_window = "03:00-04:00"
+  preferred_maintenance_window = "mon:04:00-mon:05:00"
 
   create_db_parameter_group = true
   db_parameter_group_name   = "${var.environment_name}-catalog"
