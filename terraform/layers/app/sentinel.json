@@ -1,8 +1,6 @@
 {
-  "imports": {
-    "tfplan": {
-      "data": "tfplan.json"
-    }
+  "mock": {
+    "tfplan": "tfplan.json"
   },
   "policies": [
     {
