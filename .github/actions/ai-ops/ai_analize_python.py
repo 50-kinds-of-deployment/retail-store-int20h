@@ -1,18 +1,18 @@
 import os
-import requests
 import json
 import sys
 import time
+from google import genai
 
-# Rate limiting: 5 requests per minute (12 seconds between requests)
-RATE_LIMIT_REQUESTS = 5
+# Rate limiting: 30 requests per minute (2 seconds between requests)
+RATE_LIMIT_REQUESTS = 30
 RATE_LIMIT_PERIOD = 60  # seconds
-MIN_REQUEST_INTERVAL = RATE_LIMIT_PERIOD / RATE_LIMIT_REQUESTS  # 12 seconds
+MIN_REQUEST_INTERVAL = RATE_LIMIT_PERIOD / RATE_LIMIT_REQUESTS  # 2 seconds
 
 last_request_time = 0
 
 def rate_limit():
-    """Enforce rate limiting - max 5 requests per minute."""
+    """Enforce rate limiting - max 30 requests per minute."""
     global last_request_time
     current_time = time.time()
     time_since_last_request = current_time - last_request_time
@@ -37,6 +37,10 @@ REPO = os.getenv("GITHUB_REPOSITORY")  # Format: owner/repo
 PR_NUMBER = os.getenv("GITHUB_REF").split("/")[2]
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+# Initialize Gemma client
+client = genai.Client(api_key=GEMINI_API_KEY)
+
+import requests
 HEADERS = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json"
@@ -81,30 +85,16 @@ You're a senior Android reviewer. Carefully review this code diff from `{filenam
 Diff:
 {diff_hunk}
 """
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": prompt}
-                ]
-            }
-        ]
-    }
-    debug_log(f"Gemini API URL: {url}")
-    debug_log(f"Request headers: {headers}")
-    debug_log(f"Request data: {json.dumps(data)}")
+    debug_log(f"Generating review for {filename}")
     rate_limit()
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    if response.status_code != 200:
-        print(f"[ERROR] Gemini API error {response.status_code}: {response.text}")
-        return ""
-    result = response.json()
     try:
-        comment = result["candidates"][0]["content"]["parts"][0]["text"]
+        response = client.models.generate_content(
+            model="gemma-3-27b-it",
+            contents=prompt,
+        )
+        comment = response.text
     except Exception as e:
-        print(f"[ERROR] Failed to parse Gemini response: {e}")
+        print(f"[ERROR] Gemma API error: {e}")
         return ""
     return clean_gemini_comment(comment)
 
@@ -158,27 +148,16 @@ Source file: {source_filename}
 Test file: {test_filename}
 {test_code}
 """
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-    headers = {"Content-Type": "application/json"}
-    data = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": prompt}
-                ]
-            }
-        ]
-    }
+    debug_log(f"Generating test coverage review for {source_filename} and {test_filename}")
     rate_limit()
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    if response.status_code != 200:
-        print(f"[ERROR] Gemini API error {response.status_code}: {response.text}")
-        return ""
-    result = response.json()
     try:
-        comment = result["candidates"][0]["content"]["parts"][0]["text"]
+        response = client.models.generate_content(
+            model="gemma-3-27b-it",
+            contents=prompt,
+        )
+        comment = response.text
     except Exception as e:
-        print(f"[ERROR] Failed to parse Gemini response: {e}")
+        print(f"[ERROR] Gemma API error: {e}")
         return ""
     return clean_gemini_comment(comment)
 

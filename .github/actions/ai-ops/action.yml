@@ -22,7 +22,7 @@ runs:
         python-version: ${{ inputs.python-version }}
 
     - name: Install dependencies
-      run: pip install requests
+      run: pip install requests google-genai
       shell: bash
 
     - name: Configure Git
