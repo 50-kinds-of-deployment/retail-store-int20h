@@ -7,6 +7,11 @@ on:
         description: 'Layer name to analyze (bootstrap, ops, app)'
         required: true
         type: string
+      skip-sentinel:
+        description: 'Skip Sentinel policy checks'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -49,6 +54,7 @@ jobs:
           path: ${{ steps.workdir.outputs.dir }}
 
       - name: Run Sentinel Policy Check
+        if: ${{ !inputs.skip-sentinel }}
         working-directory: ${{ steps.workdir.outputs.dir }}
         run: |
           if [ -f "sentinel.hcl" ]; then

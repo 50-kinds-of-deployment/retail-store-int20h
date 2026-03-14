@@ -24,18 +24,18 @@ jobs:
 
   sentinel:
     name: Sentinel Policy Check
-    if: ${{ !inputs.skip-sentinel }}
     needs: [plan]
     uses: ./.github/workflows/terraform-sentinel.yaml
     secrets: inherit
     with:
       layer: ${{ inputs.layer }}
+      skip-sentinel: ${{ inputs.skip-sentinel }}
 
   apply:
     name: Terraform Apply
     # Only run apply if plan detected changes (exit code 2)
     if: ${{ needs.plan.outputs.plan_exitcode == '2' }}
-    needs: ${{ inputs.skip-sentinel && fromJson('["plan"]') || fromJson('["plan", "sentinel"]') }}
+    needs: [plan, sentinel]
     uses: ./.github/workflows/terraform-apply.yaml
     secrets: inherit
     with:
