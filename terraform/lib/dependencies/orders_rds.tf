@@ -25,6 +25,7 @@ module "orders_rds" {
   backup_retention_period = 1
   preferred_backup_window = "03:00-04:00"
   preferred_maintenance_window = "mon:04:00-mon:05:00"
+  enable_http_endpoint   = true
 
   create_db_parameter_group = true
   db_parameter_group_name   = "${var.environment_name}-orders"
