@@ -58,7 +58,8 @@ jobs:
           echo "PRESIGNED_URL=$url" >> $GITHUB_ENV
 
       - name: Output report URL
-        run: echo "Semgrep HTML report available at: $PRESIGNED_URL"
+        run: |
+          echo "Semgrep HTML report available at: $PRESIGNED_URL"
 
       - name: Fail CI if findings exist
         if: env.FAIL_CI == 'true'
