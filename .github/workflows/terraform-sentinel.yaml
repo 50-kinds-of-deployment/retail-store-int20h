@@ -35,6 +35,12 @@ jobs:
           echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
         working-directory: .
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
