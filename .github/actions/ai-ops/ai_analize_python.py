@@ -2,6 +2,27 @@ import os
 import requests
 import json
 import sys
+import time
+
+# Rate limiting: 5 requests per minute (12 seconds between requests)
+RATE_LIMIT_REQUESTS = 5
+RATE_LIMIT_PERIOD = 60  # seconds
+MIN_REQUEST_INTERVAL = RATE_LIMIT_PERIOD / RATE_LIMIT_REQUESTS  # 12 seconds
+
+last_request_time = 0
+
+def rate_limit():
+    """Enforce rate limiting - max 5 requests per minute."""
+    global last_request_time
+    current_time = time.time()
+    time_since_last_request = current_time - last_request_time
+    
+    if time_since_last_request < MIN_REQUEST_INTERVAL:
+        sleep_time = MIN_REQUEST_INTERVAL - time_since_last_request
+        debug_log(f"Rate limiting: sleeping for {sleep_time:.2f} seconds")
+        time.sleep(sleep_time)
+    
+    last_request_time = time.time()
 
 # Debug flag
 DEBUG = True
@@ -23,6 +44,7 @@ HEADERS = {
 
 
 def get_changed_files():
+    rate_limit()
     url = f"https://api.github.com/repos/{REPO}/pulls/{PR_NUMBER}/files"
     print(f"[INFO] Fetching changed files from: {url}")
     response = requests.get(url, headers=HEADERS)
@@ -73,6 +95,7 @@ Diff:
     debug_log(f"Gemini API URL: {url}")
     debug_log(f"Request headers: {headers}")
     debug_log(f"Request data: {json.dumps(data)}")
+    rate_limit()
     response = requests.post(url, headers=headers, data=json.dumps(data))
     if response.status_code != 200:
         print(f"[ERROR] Gemini API error {response.status_code}: {response.text}")
@@ -86,6 +109,7 @@ Diff:
     return clean_gemini_comment(comment)
 
 def get_latest_commit_sha():
+    rate_limit()
     url = f"https://api.github.com/repos/{REPO}/pulls/{PR_NUMBER}"
     response = requests.get(url, headers=HEADERS)
     if response.status_code != 200:
@@ -95,6 +119,7 @@ def get_latest_commit_sha():
 
 def post_inline_comment(body, path, position):
     commit_id = get_latest_commit_sha()
+    rate_limit()
     url = f"https://api.github.com/repos/{REPO}/pulls/{PR_NUMBER}/comments"
     data = {
         "body": body,
@@ -110,6 +135,7 @@ def post_inline_comment(body, path, position):
         print(f"[INFO] Posted inline comment on {path}:{position}")
 
 def fetch_file_content(repo, path):
+    rate_limit()
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
     response = requests.get(url, headers=HEADERS)
     if response.status_code != 200:
@@ -143,6 +169,7 @@ Test file: {test_filename}
             }
         ]
     }
+    rate_limit()
     response = requests.post(url, headers=headers, data=json.dumps(data))
     if response.status_code != 200:
         print(f"[ERROR] Gemini API error {response.status_code}: {response.text}")
@@ -156,6 +183,7 @@ Test file: {test_filename}
     return clean_gemini_comment(comment)
 
 def post_pr_comment(body):
+    rate_limit()
     url = f"https://api.github.com/repos/{REPO}/issues/{PR_NUMBER}/comments"
     data = {"body": body}
     response = requests.post(url, headers=HEADERS, data=json.dumps(data))
