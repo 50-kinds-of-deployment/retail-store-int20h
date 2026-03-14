@@ -1,4 +1,7 @@
 {
+  "mock": {
+    "tfplan/v2": "tfplan.json"
+  },
   "policies": [
     {
       "enforcement_level": "advisory",

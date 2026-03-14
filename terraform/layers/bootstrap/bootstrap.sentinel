@@ -1,25 +1,22 @@
-import "json"
-
-# Manually load the tfplan JSON file
-tfplan = json.unmarshal(read_file("tfplan.json"))
+import "tfplan/v2" as tfplan
 
 # Filter for all S3 bucket resource changes
-s3_buckets = filter tfplan.resource_changes as rc {
-    rc.type == "aws_s3_bucket" and
-    rc.mode == "managed" and
+s3_buckets = filter tfplan.resource_changes as _, rc {
+    rc.type is "aws_s3_bucket" and
+    rc.mode is "managed" and
     (rc.change.actions contains "create" or rc.change.actions contains "update")
 }
 
 # Rule 1: Check that S3 buckets have tags defined
 s3_buckets_have_tags = rule {
-    all s3_buckets as rc {
+    all s3_buckets as _, rc {
         rc.change.after.tags is not null
     }
 }
 
 # Rule 2: Check that tags contain required keys
 s3_buckets_have_required_tags = rule {
-    all s3_buckets as rc {
+    all s3_buckets as _, rc {
         rc.change.after.tags contains "Environment" and
         rc.change.after.tags contains "Owner"
     }
@@ -30,3 +27,4 @@ main = rule {
     s3_buckets_have_tags and
     s3_buckets_have_required_tags
 }
+
