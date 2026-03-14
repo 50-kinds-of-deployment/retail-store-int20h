@@ -9,8 +9,7 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  write-all: true
+permissions: write-all
 
 jobs:
   scans:
