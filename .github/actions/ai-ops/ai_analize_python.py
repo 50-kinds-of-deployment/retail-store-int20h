@@ -35,8 +35,15 @@ def debug_log(msg):
 # === CONFIG ===
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO = os.getenv("GITHUB_REPOSITORY")  # Format: owner/repo
-PR_NUMBER = os.getenv("GITHUB_REF").split("/")[2]
+GITHUB_REF = os.getenv("GITHUB_REF", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Check if running in a PR context
+IS_PR = GITHUB_REF.startswith("refs/pull/")
+if IS_PR:
+    PR_NUMBER = GITHUB_REF.split("/")[2]
+else:
+    PR_NUMBER = None
 
 # Initialize Gemma client
 client = genai.Client(api_key=GEMINI_API_KEY)
@@ -182,6 +189,11 @@ def post_pr_comment(body):
 
 def main():
     global errors_occurred
+    
+    if not IS_PR:
+        print("[INFO] Not running in a PR context. Skipping AI code review.")
+        return 0
+    
     changed_files = get_changed_files()
     
     if errors_occurred:
