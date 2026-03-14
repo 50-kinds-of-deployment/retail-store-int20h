@@ -26,12 +26,6 @@ runs:
       run: pip install requests google-genai
       shell: bash
 
-    - name: Configure Git
-      run: |
-        git config user.name "Andarol"
-        git config user.email "oleksandrzaichko@gmail.com"
-      shell: bash
-
     - name: Run AI Review
       run: python3 .github/actions/ai-ops/ai_analize_python.py
       shell: bash
