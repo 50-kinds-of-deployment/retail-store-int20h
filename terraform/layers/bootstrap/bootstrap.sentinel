@@ -1,10 +1,10 @@
 import "tfplan/v2" as tfplan
 
-# Useful for debugging
-# print(tfplan)
-
 # Filter for all S3 bucket resource changes
-s3_buckets = filter tfplan.resource_changes as address, rc {
+# Ensure we handle the case where resource_changes is undefined
+resource_changes = tfplan.resource_changes else []
+
+s3_buckets = filter resource_changes as address, rc {
     rc.type is "aws_s3_bucket" and
     rc.mode is "managed" and
     (rc.change.actions contains "create" or rc.change.actions contains "update")
@@ -30,5 +30,6 @@ main = rule {
     s3_buckets_have_tags and
     s3_buckets_have_required_tags
 }
+
 
 
