@@ -8,7 +8,7 @@ USER node
 
 
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023
-# test build
+# test build 1
 # We tell DNF not to install Recommends and Suggests packages, which are
 # weak dependencies in DNF terminology, thus keeping our installed set of
 # packages as minimal as possible.

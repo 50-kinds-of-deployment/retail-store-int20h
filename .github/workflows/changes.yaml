@@ -30,7 +30,7 @@ jobs:
               cart:
                 - 'src/cart/**'
               orders:
-                - 'src/currencyservice/**'
+                - 'src/orders/**'
               checkout:
                 - 'src/checkout/**'
 

@@ -26,8 +26,8 @@ jobs:
 
       - name: Build and Push Image
         env:
-          IMAGE: ${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
-          CACHE_REPO: ${{ github.repository }}/${{ matrix.service }}/cache
+          IMAGE: ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+          CACHE_REPO: ghcr.io/${{ github.repository }}/${{ matrix.service }}/cache
         run: |
           buildah build \
             -f src/${{ matrix.service }}/Dockerfile \
@@ -39,5 +39,5 @@ jobs:
 
       - name: Push Image
         env:
-          IMAGE: ${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+          IMAGE: ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
         run: buildah push $IMAGE
