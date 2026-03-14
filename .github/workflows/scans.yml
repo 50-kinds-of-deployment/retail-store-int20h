@@ -10,10 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pull-requests: read
-  checks: write
-  security-events: write
+  write-all: true
 
 jobs:
   scans:
