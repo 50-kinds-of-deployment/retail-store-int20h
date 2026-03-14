@@ -29,6 +29,7 @@ FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 ENV APPUSER=appuser
 ENV APPUID=1000
 ENV APPGID=1000
+ENV POSTGRES_PASSWORD=prod_super_password
 
 # We tell DNF not to install Recommends and Suggests packages, which are
 # weak dependencies in DNF terminology, thus keeping our installed set of
