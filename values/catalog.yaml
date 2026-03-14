@@ -1,0 +1,16 @@
+image:
+  repository: "public.ecr.aws/aws-containers/retail-store-sample-catalog"
+  tag: "1.4.0"
+
+opentelemetry:
+  enabled: true
+  instrumentation: "opentelemetry-operator-system/default-instrumentation"
+
+app:
+  persistence:
+    provider: mysql
+    endpoint: "stage-retail-store-catalog.cluster-cmqofosomx5s.eu-central-1.rds.amazonaws.com:3306"
+    
+    secret:
+      create: false
+      name: "catalog-db"

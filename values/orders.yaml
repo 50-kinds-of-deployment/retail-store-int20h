@@ -1,0 +1,27 @@
+image:
+  repository: "public.ecr.aws/aws-containers/retail-store-sample-orders"
+  tag: "1.4.0"
+
+opentelemetry:
+  enabled: true
+  instrumentation: "opentelemetry-operator-system/default-instrumentation"
+
+app:
+  persistence:
+    provider: 'postgres'
+    endpoint: 'stage-retail-store-orders.cluster-cmqofosomx5s.eu-central-1.rds.amazonaws.com:5432'
+    database: 'orders'
+
+    secret:
+      create: false
+      name: "orders-db"
+
+  messaging:
+    provider: 'rabbitmq'
+
+    rabbitmq:
+      addresses: ["amqp://stage-retail-store-mq.mq.eu-central-1.amazonaws.com:5671"]
+
+      secret:
+        create: false
+        name: "orders-rabbitmq"

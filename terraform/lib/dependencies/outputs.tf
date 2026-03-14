@@ -132,3 +132,18 @@ output "checkout_elasticache_port" {
   value       = module.checkout_elasticache_redis.port
   description = "Checkout Redis port"
 }
+
+output "catalog_db_secret_arn" {
+  value       = aws_secretsmanager_secret.catalog_db_credentials.arn
+  description = "ARN of the AWS Secrets Manager secret for Catalog DB credentials"
+}
+
+output "orders_db_secret_arn" {
+  value       = aws_secretsmanager_secret.orders_db_credentials.arn
+  description = "ARN of the AWS Secrets Manager secret for Orders DB credentials"
+}
+
+output "mq_secret_arn" {
+  value       = aws_secretsmanager_secret.mq_credentials.arn
+  description = "ARN of the AWS Secrets Manager secret for RabbitMQ credentials"
+}
