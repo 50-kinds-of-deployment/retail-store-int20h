@@ -72,15 +72,23 @@ jobs:
             # Convert tfplan to JSON for Sentinel
             terraform show -json tfplan > tfplan.json
             
-            # Run Sentinel policy checks
-            sentinel apply sentinel.json
+            # Determine policy file name based on layer
+            LAYER="${{ inputs.layer }}"
+            POLICY_FILE="${LAYER}.sentinel"
             
-            if [ $? -eq 0 ]; then
-              echo "Sentinel policy checks passed"
+            if [ -f "$POLICY_FILE" ]; then
+              # Run Sentinel with config file
+              sentinel apply -config=sentinel.json "$POLICY_FILE"
+              
+              if [ $? -eq 0 ]; then
+                echo "Sentinel policy checks passed"
+              else
+                echo "Sentinel policy checks failed"
+                exit 1
+              fi
             else
-              echo "Sentinel policy checks failed"
-              exit 1
+              echo "No policy file found ($POLICY_FILE), skipping checks"
             fi
           else
-            echo "No Sentinel policy file found, skipping checks"
+            echo "No Sentinel configuration found (sentinel.json), skipping checks"
           fi
