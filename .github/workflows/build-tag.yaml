@@ -27,8 +27,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: write
-      packages: write
 
     steps:
       - name: Checkout repository
@@ -48,23 +48,36 @@ jobs:
           
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Get AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          role-session-name: TagServiceBuild
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Push Image
         env:
-          IMAGE: ghcr.io/${{ github.repository }}/${{ inputs.service }}:${{ steps.version.outputs.new_version }}
-          CACHE_REPO: ghcr.io/${{ github.repository }}/${{ inputs.service }}/cache
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ inputs.service }}
+          IMAGE_TAG: ${{ steps.version.outputs.new_version }}
         run: |
-          buildah build \
-            -f src/${{ inputs.service }}/Dockerfile \
-            --layers \
-            --cache-from $CACHE_REPO \
-            --cache-to $CACHE_REPO \
-            -t $IMAGE \
-            src/${{ inputs.service }}
+          IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
           
-          buildah push $IMAGE
+          echo "Building service: $REPOSITORY with tag: $IMAGE_TAG"
+          
+          buildah build \
+            -f src/$REPOSITORY/Dockerfile \
+            --layers \
+            --cache-from $REGISTRY/$REPOSITORY \
+            --cache-to $REGISTRY/$REPOSITORY \
+            -t $IMAGE_URI \
+            src/$REPOSITORY
+          
+          buildah push $IMAGE_URI
 
       - name: Update versions.yaml
         run: |
