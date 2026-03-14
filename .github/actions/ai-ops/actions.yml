@@ -1,0 +1,29 @@
+name: AI Code Review
+description: Runs AI-powered code review on pull requests
+
+inputs:
+  python-version:
+    description: Python version to use
+    required: false
+    default: '3.11'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install dependencies
+      run: pip install requests
+      shell: bash
+
+    - name: Run AI Review
+      run: python3 .github/scripts/ai_code_review.py
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_REF: ${{ github.ref }}

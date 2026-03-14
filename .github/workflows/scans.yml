@@ -1,0 +1,30 @@
+name: "Scans"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scans:
+    name: "Comprehensive Scans"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Env
+        uses: ./.github/actions/setup-env
+
+      - name: Run AI Ops
+        uses: ./.github/actions/ai-ops
+        with:
+          python-version: '3.11'
