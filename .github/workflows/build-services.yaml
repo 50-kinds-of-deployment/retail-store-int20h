@@ -35,7 +35,7 @@ jobs:
             --cache-from $CACHE_REPO \
             --cache-to $CACHE_REPO \
             -t $IMAGE \
-            .
+            src/${{ matrix.service }}
 
       - name: Push Image
         env:
