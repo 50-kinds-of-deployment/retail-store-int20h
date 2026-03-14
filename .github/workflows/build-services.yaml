@@ -1,8 +1,9 @@
 name: Build services on main
+
 on:
   push:
     branches:
-      - "main"
+      - "ci/ecr"
 
 jobs:
   changes:
@@ -15,29 +16,40 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix: ${{ fromJson(needs.changes.outputs.matrix) }}
+      fail-fast: false
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v4
 
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+      - name: Get AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          role-session-name: MainBranchBuild
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Push Image
         env:
-          IMAGE: ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
-          CACHE_REPO: ghcr.io/${{ github.repository }}/${{ matrix.service }}/cache
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ matrix.service }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
+          IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          CACHE_REPO="$REGISTRY/$REPOSITORY:cache"
+          
+          echo "Building service: ${{ matrix.service }}"
+          
           buildah build \
             -f src/${{ matrix.service }}/Dockerfile \
             --layers \
             --cache-from $CACHE_REPO \
             --cache-to $CACHE_REPO \
-            -t $IMAGE \
+            -t $IMAGE_URI \
             src/${{ matrix.service }}
-
-      - name: Push Image
-        env:
-          IMAGE: ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
-        run: buildah push $IMAGE
+          
+          buildah push $IMAGE_URI
