@@ -6,7 +6,7 @@
   },
   "policies": [
     {
-      "enforcement_level": "advisory",
+      "enforcement_level": "hard-mandatory",
       "path": "bootstrap.sentinel"
     }
   ]

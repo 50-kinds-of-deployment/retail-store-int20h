@@ -1,35 +1,30 @@
 import "tfplan/v2" as tfplan
 
-# Filter for all S3 bucket resource changes
-# Ensure we handle the case where resource_changes is undefined
-resource_changes = tfplan.resource_changes else []
+# Define required tags
+required_tags = ["Environment", "Owner", "Project", "ManagedBy"]
 
-s3_buckets = filter resource_changes as address, rc {
-    rc.type is "aws_s3_bucket" and
+# Filter for all managed resources being created or updated
+managed_resources = filter tfplan.resource_changes as address, rc {
     rc.mode is "managed" and
     (rc.change.actions contains "create" or rc.change.actions contains "update")
 }
 
-# Rule 1: Check that S3 buckets have tags defined
-s3_buckets_have_tags = rule {
-    all s3_buckets as address, rc {
-        rc.change.after.tags is not null
-    }
-}
-
-# Rule 2: Check that tags contain required keys
-s3_buckets_have_required_tags = rule {
-    all s3_buckets as address, rc {
-        rc.change.after.tags contains "Environment" and
-        rc.change.after.tags contains "Owner"
+# Rule: All managed resources MUST have the required tags present and not empty
+mandatory_tags_present = rule {
+    all managed_resources as address, rc {
+        all required_tags as t {
+            rc.change.after.tags is not null and
+            t in rc.change.after.tags and
+            length(rc.change.after.tags[t]) > 0
+        }
     }
 }
 
 # Main rule
 main = rule {
-    s3_buckets_have_tags and
-    s3_buckets_have_required_tags
+    mandatory_tags_present
 }
+
 
 
 
