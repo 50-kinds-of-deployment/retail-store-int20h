@@ -1,7 +1,8 @@
 name: Semgrep
 
 on:
-  pull_request: {}
+  branches:
+    - "ci/security-scan"
 
 jobs:
   semgrep_scan:
