@@ -20,7 +20,7 @@ app:
     provider: 'rabbitmq'
 
     rabbitmq:
-      addresses: ["amqp://stage-retail-store-mq.mq.eu-central-1.amazonaws.com:5671"]
+      addresses: ["amqps://b-3d28052e-fe42-4c1d-8cbd-6b882567b389.mq.eu-central-1.on.aws:5671"]
 
       secret:
         create: false
