@@ -19,11 +19,17 @@ runs:
       run: pip install requests
       shell: bash
 
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+      shell: bash
+
     - name: Run AI Review
       run: python3 .github/scripts/ai_code_review.py
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_REF: ${{ github.ref }}

@@ -12,38 +12,14 @@ def debug_log(msg):
 
 # === CONFIG ===
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-if not GITHUB_TOKEN:
-    print("[ERROR] GITHUB_TOKEN is not set!", file=sys.stderr)
-    exit(1)
-else:
-    debug_log(f"GITHUB_TOKEN starts with: {GITHUB_TOKEN[:6]}... (length: {len(GITHUB_TOKEN)})")
-
 REPO = os.getenv("GITHUB_REPOSITORY")  # Format: owner/repo
-if not REPO:
-    print("[ERROR] GITHUB_REPOSITORY is not set!", file=sys.stderr)
-    exit(1)
-else:
-    debug_log(f"GITHUB_REPOSITORY: {REPO}")
-
 PR_NUMBER = os.getenv("GITHUB_REF").split("/")[2]
-if not PR_NUMBER:
-    print("[ERROR] GITHUB_REF is not set or not in the correct format!", file=sys.stderr)
-    exit(1)
-else:
-    debug_log(f"GITHUB_REF: {PR_NUMBER}")
-
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    print("[ERROR] GEMINI_API_KEY is not set!", file=sys.stderr)
-    exit(1)
-else:
-    debug_log(f"GEMINI_API_KEY starts with: {GEMINI_API_KEY[:6]}... (length: {len(GEMINI_API_KEY)})")
 
 HEADERS = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json"
 }
-debug_log(f"HEADERS: {HEADERS}")
 
 
 def get_changed_files():
