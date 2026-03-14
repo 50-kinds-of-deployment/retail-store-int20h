@@ -2,7 +2,7 @@ name: Build services
 on:
   push:
     branches:
-      - "ci/buildah"
+      - "ci/buildah" #TODO change later to main
 
 jobs:
   changes:
