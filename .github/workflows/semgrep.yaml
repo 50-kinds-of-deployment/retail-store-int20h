@@ -20,7 +20,10 @@ jobs:
       - name: Perform Semgrep Analysis
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: semgrep --config=auto --sarif src --sarif-output=semgrep-results.sarif
+        run: semgrep ci --sarif --sarif-output=semgrep-results.sarif
+
+      - name: Install Python
+        run: apk add --no-cache python3
 
       - name: Generate HTML report
         run: |
