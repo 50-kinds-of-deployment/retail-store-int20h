@@ -11,6 +11,14 @@ resource "aws_s3_bucket" "retail_store_bucket" {
     "Name"        = "Terraform State Bucket"
   }
 }
+resource "aws_s3_bucket" "retail_store_bucket123" {
+  bucket = "retail-store-tf-state-eu-central-1"
+
+  tags = {
+    "Environment" = "shared"
+    "Name"        = "Terraform State Bucket"
+  }
+}
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "retail_store_bucket" {
   bucket = aws_s3_bucket.retail_store_bucket.id
