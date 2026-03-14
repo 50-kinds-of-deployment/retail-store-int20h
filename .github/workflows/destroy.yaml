@@ -22,6 +22,7 @@ permissions:
 jobs:
   destroy:
     runs-on: ubuntu-24.04
+    environment: stage
     env:
       TF_IN_AUTOMATION: true
     steps:
@@ -31,7 +32,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1
+          aws-region: eu-central-1
 
       - uses: hashicorp/setup-terraform@v3
 
