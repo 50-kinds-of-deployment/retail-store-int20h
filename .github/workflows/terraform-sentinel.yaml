@@ -71,6 +71,14 @@ jobs:
             echo "Running Sentinel policy checks..."
             
             # Convert tfplan to JSON for Sentinel
+            # Wrap tfplan.json content in a root object to match Sentinel tfplan/v2 expectation
+            terraform show -json tfplan > raw_tfplan.json
+            echo '{"terraform_version": "1.0.0", "format_version": "0.1"}' > tfplan.json
+            cat raw_tfplan.json >> tfplan.json
+            
+            # Actually, Sentinel expects the tfplan/v2 mock to be just the JSON output of terraform show -json.
+            # However, some versions of the CLI are picky about the structure.
+            # Let's ensure tfplan.json is exactly the output of terraform show -json.
             terraform show -json tfplan > tfplan.json
             
             # Determine policy file name based on layer
