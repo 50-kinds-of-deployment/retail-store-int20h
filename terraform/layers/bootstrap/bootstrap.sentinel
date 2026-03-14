@@ -1,4 +1,29 @@
-main = rule {
-  true
+import "json"
+
+# Require S3 bucket for state backend in bootstrap layer
+s3_bucket_exists = rule {
+  length(filter(json.unmarshal(read_file("tfplan.json")).resource_changes or [], 
+    .type == "aws_s3_bucket")) > 0
 }
+
+# Require DynamoDB table for state locking
+dynamodb_exists = rule {
+  length(filter(json.unmarshal(read_file("tfplan.json")).resource_changes or [], 
+    .type == "aws_dynamodb_table")) > 0
+}
+
+# Require KMS key for encryption
+kms_key_exists = rule {
+  length(filter(json.unmarshal(read_file("tfplan.json")).resource_changes or [], 
+    .type == "aws_kms_key")) > 0
+}
+
+# All checks must pass
+main = rule {
+  s3_bucket_exists and
+  dynamodb_exists and
+  kms_key_exists
+}
+
+
 
