@@ -1,6 +1,41 @@
-import {
-  to = aws_s3_bucket.retail_store_bucket
-  id = "retail-store-tf-state-eu-central-1"
+resource "aws_ecr_repository" "catalog" {
+  name                 = "catalog"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "ui" {
+  name                 = "ui"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "orders" {
+  name                 = "orders"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "checkout" {
+  name                 = "checkout"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "cart" {
+  name                 = "cart"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 resource "aws_s3_bucket" "retail_store_bucket" {
