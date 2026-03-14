@@ -1,0 +1,79 @@
+name: Build Image with tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to build'
+        required: true
+        type: choice
+        options:
+          - ui
+          - catalog
+          - cart
+          - orders
+          - checkout
+      version_type:
+        description: 'Level of version bump'
+        required: true
+        type: choice
+        default: patch
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Calculate New Version
+        id: version
+        run: |
+          current_version=$(yq e ".${{ inputs.service }}.tag" versions.yaml)
+          IFS='.' read -r major minor patch <<< "$current_version"
+          
+          case "${{ inputs.version_type }}" in
+            major) new_version="$((major + 1)).0.0" ;;
+            minor) new_version="$major.$((minor + 1)).0" ;;
+            patch) new_version="$major.$minor.$((patch + 1))" ;;
+          esac
+          
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and Push Image
+        env:
+          IMAGE: ghcr.io/${{ github.repository }}/${{ inputs.service }}:${{ steps.version.outputs.new_version }}
+          CACHE_REPO: ghcr.io/${{ github.repository }}/${{ inputs.service }}/cache
+        run: |
+          buildah build \
+            -f src/${{ inputs.service }}/Dockerfile \
+            --layers \
+            --cache-from $CACHE_REPO \
+            --cache-to $CACHE_REPO \
+            -t $IMAGE \
+            src/${{ inputs.service }}
+          
+          buildah push $IMAGE
+
+      - name: Update versions.yaml
+        run: |
+          yq e ".${{ inputs.service }}.tag = \"${{ steps.version.outputs.new_version }}\"" -i versions.yaml
+
+      - name: Commit and Push version update
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add versions.yaml
+          git commit -m "Bump ${{ inputs.service }} (${{ inputs.version_type }}) to ${{ steps.version.outputs.new_version }}"
+          git push

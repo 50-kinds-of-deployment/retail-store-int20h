@@ -1,0 +1,10 @@
+ui:
+  tag: 0.0.0
+cart:
+  tag: 0.0.0
+catalog:
+  tag: 0.0.0
+checkout:
+  tag: 0.0.0
+orders:
+  tag: 0.0.0
