@@ -43,15 +43,14 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
-          CACHE_REPO="$REGISTRY/$REPOSITORY:cache"
           
           echo "Building service: ${{ matrix.service }}"
           
           buildah build \
             -f src/${{ matrix.service }}/Dockerfile \
             --layers \
-            --cache-from $CACHE_REPO \
-            --cache-to $CACHE_REPO \
+            --cache-from $REGISTRY/$REPOSITORY \
+            --cache-to $REGISTRY/$REPOSITORY \
             -t $IMAGE_URI \
             src/${{ matrix.service }}
           
