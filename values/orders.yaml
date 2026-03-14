@@ -9,7 +9,6 @@ opentelemetry:
 app:
   persistence:
     provider: 'postgres'
-    endpoint: 'stage-retail-store-orders.c5ayo88cohe4.eu-central-1.rds.amazonaws.com:5432'
     database: 'orders'
 
     secret:

@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy infrastructure
 run-name: Deploy infrastructure
 
 on:
