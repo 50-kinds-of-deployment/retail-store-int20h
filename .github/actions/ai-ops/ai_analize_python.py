@@ -60,14 +60,14 @@ def get_changed_files():
 
 def clean_gemini_comment(comment):
     """
-    Clean and format Gemini's response for GitHub inline comments.
+    Clean and format Gemma's response for GitHub PR comments.
     - Trims whitespace
-    - Limits length to 650 chars
+    - Limits length to 65536 chars (GitHub API limit is much higher)
     - Removes excessive blank lines
     """
     comment = comment.strip()
     comment = '\n'.join([line.rstrip() for line in comment.splitlines() if line.strip() != ''])
-    max_length = 650
+    max_length = 65536
     if len(comment) > max_length:
         comment = comment[:max_length] + "\u2026"
     return comment
