@@ -53,3 +53,20 @@ resource "aws_security_group_rule" "mq" {
 
   source_security_group_id = local.allowed_security_group_ids[count.index]
 }
+
+resource "aws_secretsmanager_secret" "mq_credentials" {
+  name        = "${var.environment_name}-mq-credentials"
+  description = "Credentials for the RabbitMQ broker"
+
+  recovery_window_in_days = 0 # Force deletion without recovery to ease destruction
+  tags                    = var.tags
+}
+
+resource "aws_secretsmanager_secret_version" "mq_credentials" {
+  secret_id = aws_secretsmanager_secret.mq_credentials.id
+  secret_string = jsonencode({
+    username = local.mq_default_user
+    password = random_password.mq_password.result
+    endpoint = aws_mq_broker.mq.instances[0].endpoints[0]
+  })
+}

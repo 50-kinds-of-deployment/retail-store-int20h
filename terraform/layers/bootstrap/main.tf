@@ -1,6 +1,41 @@
-import {
-  to = aws_s3_bucket.retail_store_bucket
-  id = "retail-store-tf-state-eu-central-1"
+resource "aws_ecr_repository" "catalog" {
+  name                 = "catalog"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "ui" {
+  name                 = "ui"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "orders" {
+  name                 = "orders"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "checkout" {
+  name                 = "checkout"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "cart" {
+  name                 = "cart"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 resource "aws_s3_bucket" "retail_store_bucket" {
@@ -10,6 +45,32 @@ resource "aws_s3_bucket" "retail_store_bucket" {
     "Environment" = "shared"
     "Name"        = "Terraform State Bucket"
   }
+}
+
+resource "aws_s3_bucket" "reports_bucket" {
+  bucket = "retail-store-reports-bucket"
+
+  tags = {
+    "Environment" = "shared"
+    "Name"        = "Retail Store Reports Bucket"
+  }
+}
+
+resource "aws_s3_bucket_policy" "public_read_policy" {
+  bucket = aws_s3_bucket.reports_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.reports_bucket.arn}/*"
+      }
+    ]
+  })
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "retail_store_bucket" {
