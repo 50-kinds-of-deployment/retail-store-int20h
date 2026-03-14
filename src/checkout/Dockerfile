@@ -1,5 +1,6 @@
 FROM node:20-alpine AS build
 WORKDIR /usr/src/app
+RUN apk add --no-cache yarn
 COPY --chown=node:node package*.json ./
 COPY --chown=node:node . .
 RUN yarn install --frozen-lockfile
