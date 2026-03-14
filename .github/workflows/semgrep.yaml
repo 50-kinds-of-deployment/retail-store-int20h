@@ -54,16 +54,12 @@ jobs:
           role-session-name: SemgrepReportUpload
 
       - name: Upload semgrep report to S3
-        run: aws s3 cp semgrep-report.html s3://${{ secrets.AWS_S3_REPORTS_BUCKET }}/semgrep-report-pr${{ github.event.pull_request.number }}.html
-
-      - name: Generate presigned URL
+        env:
+          AWS_S3_REPORTS_BUCKET: retail-store-reports-bucket
         run: |
-          url=$(aws s3 presign s3://${{ secrets.AWS_S3_REPORTS_BUCKET }}/semgrep-report-pr${{ github.event.pull_request.number }}.html --expires-in 604800)
-          echo "PRESIGNED_URL=$url" >> $GITHUB_ENV
+          aws s3 cp semgrep-report.html s3://$AWS_S3_REPORTS_BUCKET/semgrep-report-pr${{ github.event.pull_request.number }}.html --acl public-read
+          echo "Semgrep HTML report available at: https://$AWS_S3_REPORTS_BUCKET.s3.amazonaws.com/semgrep-report-pr${{ github.event.pull_request.number }}.html"
 
-      - name: Output report URL
-        run: |
-          echo "Semgrep HTML report available at: $PRESIGNED_URL"
 
       - name: Fail CI if findings exist
         if: env.FAIL_CI == 'true'
