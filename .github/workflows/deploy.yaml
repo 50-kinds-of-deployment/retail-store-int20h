@@ -14,6 +14,11 @@ on:
           - ops
           - app
           - all
+      skip-sentinel:
+        description: 'Skip Sentinel policy checks'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -27,6 +32,7 @@ jobs:
     secrets: inherit
     with:
       layer: bootstrap
+      skip-sentinel: ${{ inputs.skip-sentinel }}
 
   ops:
     name: Deploy ops layer
@@ -36,6 +42,7 @@ jobs:
     secrets: inherit
     with:
       layer: ops
+      skip-sentinel: ${{ inputs.skip-sentinel }}
 
   app:
     name: Deploy app layer
@@ -45,3 +52,4 @@ jobs:
     secrets: inherit
     with:
       layer: app
+      skip-sentinel: ${{ inputs.skip-sentinel }}
