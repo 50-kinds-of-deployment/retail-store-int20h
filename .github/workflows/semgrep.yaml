@@ -57,7 +57,7 @@ jobs:
         env:
           AWS_S3_REPORTS_BUCKET: retail-store-reports-bucket
         run: |
-          aws s3 cp semgrep-report.html s3://$AWS_S3_REPORTS_BUCKET/semgrep-report-pr${{ github.event.number }}.html --acl public-read
+          aws s3 cp semgrep-report.html s3://$AWS_S3_REPORTS_BUCKET/semgrep-report-pr${{ github.event.number }}.html
           echo "Semgrep HTML report available at: https://$AWS_S3_REPORTS_BUCKET.s3.amazonaws.com/semgrep-report-pr${{ github.event.number }}.html"
 
 
