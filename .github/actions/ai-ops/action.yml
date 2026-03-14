@@ -1,0 +1,35 @@
+name: AI Code Review
+description: Runs AI-powered code review on pull requests
+
+inputs:
+  python-version:
+    description: Python version to use
+    required: false
+    default: '3.11'
+  github-token:
+    description: GitHub token for API access
+    required: true
+  gemini-api-key:
+    description: API key for Gemini AI
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install dependencies
+      run: pip install requests google-genai
+      shell: bash
+
+    - name: Run AI Review
+      run: python3 .github/actions/ai-ops/ai_analize_python.py
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_REF: ${{ github.ref }}
