@@ -1,7 +1,6 @@
 mock "tfplan/v2" {
-  module {
-    source = "tfplan.json"
-    format = "json"
+  data = {
+    tfplan = "tfplan.json"
   }
 }
 
