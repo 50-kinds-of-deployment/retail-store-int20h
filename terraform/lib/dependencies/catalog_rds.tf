@@ -1,39 +1,35 @@
 module "catalog_rds" {
-  source  = "terraform-aws-modules/rds-aurora/aws"
-  version = "7.7.1"
+  source  = "terraform-aws-modules/rds/aws"
+  version = "~> 6.0"
 
-  name                        = "${var.environment_name}-catalog"
-  engine                      = "aurora-mysql"
-  engine_version              = "8.0"
-  instance_class              = "db.t3.medium"
-  allow_major_version_upgrade = true
+  depends_on = [aws_db_subnet_group.catalog]
 
-  instances = {
-    one = {}
-  }
+  identifier           = "${var.environment_name}-catalog"
+  family               = "mysql8.0"
+  major_engine_version = "8.0"
+  engine               = "mysql"
+  engine_version       = "8.0.40"
+  instance_class       = "db.t3.micro"
 
-  vpc_id  = var.vpc_id
-  subnets = var.subnet_ids
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  storage_encrypted     = true
+  storage_type          = "gp2"
 
-  allowed_security_groups = concat(var.allowed_security_group_ids, [var.catalog_security_group_id])
+  db_name  = "catalog"
+  username = "catalyst"
+  password = random_string.catalog_db_master.result
+  port     = 3306
 
-  master_password        = random_string.catalog_db_master.result
-  create_random_password = false
-  database_name          = "catalog"
-  storage_encrypted      = true
-  apply_immediately      = true
+  vpc_security_group_ids = [var.catalog_security_group_id]
+  db_subnet_group_name   = "${var.environment_name}-catalog-subnet"
+  publicly_accessible    = false
   skip_final_snapshot    = true
   backup_retention_period = 1
-  preferred_backup_window = "03:00-04:00"
-  preferred_maintenance_window = "mon:04:00-mon:05:00"
-
-  create_db_parameter_group = true
-  db_parameter_group_name   = "${var.environment_name}-catalog"
-  db_parameter_group_family = "aurora-mysql8.0"
-
-  create_db_cluster_parameter_group = true
-  db_cluster_parameter_group_name   = "${var.environment_name}-catalog"
-  db_cluster_parameter_group_family = "aurora-mysql8.0"
+  backup_window          = "03:00-04:00"
+  maintenance_window     = "mon:04:00-mon:05:00"
+  apply_immediately      = true
+  multi_az               = false
 
   tags = var.tags
 }

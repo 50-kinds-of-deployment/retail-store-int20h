@@ -1,38 +1,35 @@
 module "orders_rds" {
-  source  = "terraform-aws-modules/rds-aurora/aws"
-  version = "7.7.1"
+  source  = "terraform-aws-modules/rds/aws"
+  version = "~> 6.0"
 
-  name           = "${var.environment_name}-orders"
-  engine         = "aurora-postgresql"
-  engine_version = "15.10"
-  instance_class = "db.t3.medium"
+  depends_on = [aws_db_subnet_group.orders]
 
-  instances = {
-    one = {}
-  }
+  identifier           = "${var.environment_name}-orders"
+  family               = "postgres15"
+  major_engine_version = "15"
+  engine               = "postgres"
+  engine_version       = "15.15"
+  instance_class       = "db.t3.micro"
 
-  vpc_id  = var.vpc_id
-  subnets = var.subnet_ids
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  storage_encrypted     = true
+  storage_type          = "gp2"
 
-  allowed_security_groups = concat(var.allowed_security_group_ids, [var.orders_security_group_id])
+  db_name  = "orders"
+  username = "postgres"
+  password = random_string.orders_db_master.result
+  port     = 5432
 
-  master_password        = random_string.orders_db_master.result
-  create_random_password = false
-  database_name          = "orders"
-  storage_encrypted      = true
-  apply_immediately      = true
+  vpc_security_group_ids = [var.orders_security_group_id]
+  db_subnet_group_name   = "${var.environment_name}-orders-subnet"
+  publicly_accessible    = false
   skip_final_snapshot    = true
   backup_retention_period = 1
-  preferred_backup_window = "03:00-04:00"
-  preferred_maintenance_window = "mon:04:00-mon:05:00"
-
-  create_db_parameter_group = true
-  db_parameter_group_name   = "${var.environment_name}-orders"
-  db_parameter_group_family = "aurora-postgresql15"
-
-  create_db_cluster_parameter_group = true
-  db_cluster_parameter_group_name   = "${var.environment_name}-orders"
-  db_cluster_parameter_group_family = "aurora-postgresql15"
+  backup_window          = "03:00-04:00"
+  maintenance_window     = "mon:04:00-mon:05:00"
+  apply_immediately      = true
+  multi_az               = false
 
   tags = var.tags
 }
