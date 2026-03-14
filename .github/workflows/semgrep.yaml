@@ -1,8 +1,9 @@
 name: Semgrep
 
 on:
-  branches:
-    - "ci/security-scan"
+  push:
+    branches:
+      - "ci/security-scan"
 
 jobs:
   semgrep_scan:
