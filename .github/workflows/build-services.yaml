@@ -55,3 +55,11 @@ jobs:
             src/${{ matrix.service }}
           
           buildah push $IMAGE_URI
+
+      - name: Tag as latest
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ matrix.service }}
+        run: |
+          buildah tag "$REGISTRY/$REPOSITORY:${{ github.sha }}" "$REGISTRY/$REPOSITORY:latest"
+          buildah push "$REGISTRY/$REPOSITORY:latest"          
