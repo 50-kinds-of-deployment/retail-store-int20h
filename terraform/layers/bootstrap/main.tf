@@ -12,15 +12,6 @@ resource "aws_s3_bucket" "retail_store_bucket" {
   }
 }
 
-resource "aws_s3_bucket" "reports_bucket" {
-  bucket = "retail-store-reports-bucket"
-
-  tags = {
-    "Environment" = "shared"
-    "Name"        = "Retail Store Reports Bucket"
-  }
-}
-
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "retail_store_bucket" {
   bucket = aws_s3_bucket.retail_store_bucket.id

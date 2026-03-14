@@ -103,36 +103,6 @@ resource "helm_release" "catalog" {
   ]
 }
 
-resource "kubernetes_namespace_v1" "carts" {
-  depends_on = [
-    data.kubernetes_nodes.vpc_ready_nodes
-  ]
-
-  metadata {
-    name = "carts"
-
-    labels = var.istio_enabled ? local.istio_labels : {}
-  }
-}
-
-resource "helm_release" "carts" {
-  name  = "carts"
-  chart = "../../../src/cart/chart"
-
-  namespace = kubernetes_namespace_v1.carts.metadata[0].name
-
-  values = [
-    templatefile("${path.module}/values/carts.yaml", {
-      image_repository              = module.container_images.result.cart.repository
-      image_tag                     = module.container_images.result.cart.tag
-      opentelemetry_enabled         = var.opentelemetry_enabled
-      opentelemetry_instrumentation = local.opentelemetry_instrumentation
-      role_arn                      = module.iam_assumable_role_carts.iam_role_arn
-      table_name                    = local.ops_outputs.carts_dynamodb_table_name
-    })
-  ]
-}
-
 resource "kubernetes_namespace_v1" "checkout" {
   depends_on = [
     data.kubernetes_nodes.vpc_ready_nodes

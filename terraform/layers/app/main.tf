@@ -11,3 +11,13 @@ resource "helm_release" "argocd" {
   wait            = true
   cleanup_on_fail = true
 }
+
+resource "helm_release" "app_of_apps" {
+  chart = "../../../argocd/app-of-apps"
+  name  = "app-of-apps"
+
+  wait            = true
+  cleanup_on_fail = true
+  timeout         = 3600
+  depends_on      = [helm_release.argocd]
+}
