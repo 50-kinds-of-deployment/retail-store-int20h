@@ -43,7 +43,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "checkout.configMapName" . }}
-            {{- if .Values.app.persistence.secret.name }}
+            {{- if and .Values.app.persistence.secret .Values.app.persistence.secret.name }}
             - secretRef:
                 name: {{ .Values.app.persistence.secret.name }}
             {{- end }}
