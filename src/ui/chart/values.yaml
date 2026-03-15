@@ -52,9 +52,9 @@ resources:
     memory: 512Mi
 
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 3
   targetCPUUtilizationPercentage: 50
 
 nodeSelector: {}
