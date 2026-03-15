@@ -17,7 +17,7 @@ spec:
     targetRevision: terragrunt
     helm:
       valueFiles:
-        - ../../../values/prod/ui.yaml
+        - /values/prod/ui.yaml
   project: default
   syncPolicy:
     automated:
