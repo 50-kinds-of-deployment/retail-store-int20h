@@ -41,6 +41,10 @@ module "eks_cluster" {
       min_size     = 1
       max_size     = 3
       desired_size = 1
+
+      iam_role_additional_policies = {
+        AmazonEC2ReadOnlyAccess = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+      }
     }
 
     node_group_2 = {
@@ -52,6 +56,10 @@ module "eks_cluster" {
       min_size     = 1
       max_size     = 3
       desired_size = 1
+
+      iam_role_additional_policies = {
+        AmazonEC2ReadOnlyAccess = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+      }
     }
 
     node_group_3 = {
@@ -63,6 +71,10 @@ module "eks_cluster" {
       min_size     = 1
       max_size     = 3
       desired_size = 1
+
+      iam_role_additional_policies = {
+        AmazonEC2ReadOnlyAccess = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+      }
     }
   }
 
