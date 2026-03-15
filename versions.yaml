@@ -7,4 +7,4 @@ catalog:
 checkout:
   tag: 1.0.0
 orders:
-  tag: 0.0.0
+  tag: 1.0.0
