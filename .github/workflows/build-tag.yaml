@@ -1,4 +1,5 @@
 name: Build Image with tag
+run-name : Build and Tag ${{ github.event.inputs.service }} with ${{ github.event.inputs.version_type }} bump
 
 on:
   workflow_dispatch:
