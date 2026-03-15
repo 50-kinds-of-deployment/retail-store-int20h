@@ -14,3 +14,8 @@ app:
 
   endpoints:
     orders: 'http://orders.orders.svc:80'
+
+securityGroups:
+  create: true
+  securityGroupIds:
+    - 'sg-0930785c2e66c4322'
