@@ -17,7 +17,7 @@ app:
       username: "postgres"
 
     postgres:
-      endpoint: "localhost:5432"
+      endpoint: "catalog-prod-mysql"
 
   messaging:
     provider: "rabbitmq"
