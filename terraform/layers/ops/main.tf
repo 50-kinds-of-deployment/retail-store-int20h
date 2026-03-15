@@ -51,6 +51,23 @@ module "retail_app_eks" {
   istio_enabled = var.istio_enabled
 }
 
+resource "aws_eks_addon" "ebs_csi" {
+  cluster_name = module.retail_app_eks.name
+  addon_name   = "aws-ebs-csi-driver"
+}
+
+resource "aws_eks_addon" "metrics_server" {
+  cluster_name = module.retail_app_eks.name
+  addon_name   = "metrics-server"
+}
+
+resource "aws_eks_addon" "cloudwatch_observability" {
+  cluster_name             = aws_eks_cluster.main.name
+  addon_name               = "amazon-cloudwatch-observability"
+  service_account_role_arn = aws_iam_role.cloudwatch_role.arn
+}
+
+
 module "dependencies" {
   source = "../../lib/dependencies"
 
