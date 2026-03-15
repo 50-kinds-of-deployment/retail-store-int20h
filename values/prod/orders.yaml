@@ -15,6 +15,8 @@ app:
       create: true
       name: "orders-db"
       username: "postgres"
+      password: "postgres"
+      
 
     postgres:
       endpoint: "orders-prod-postgresql:5432"
@@ -30,6 +32,7 @@ app:
         name: "orders-rabbitmq"
         username: "admin"
         password: "admin"
+
 
 postgresql:
   create: true
