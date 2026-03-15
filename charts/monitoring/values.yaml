@@ -6,16 +6,7 @@ victoria-metrics-k8s-stack:
       plain: true
   alertmanager:
     enabled: true
-    templateFiles:
-      telegram.tmpl: |-
-        {{ define "telegram.main" }}
-        {{ if eq .Status "firing" }}🔥 <b>{{ .Status | upper }}</b>{{ else }}✅ <b>{{ .Status | upper }}</b>{{ end }}
-        <b>Alerts:</b> {{ .Alerts.Firing | len }}
-        {{ range .Alerts }}
-        <b>- {{ .Labels.alertname }}</b>
-        <i>{{ .Annotations.summary }}</i>
-        {{ end }}
-        {{ end }}
+    config:
       route:
         group_by: ["alertname", "cluster", "service"]
         group_wait: 30s
@@ -27,7 +18,7 @@ victoria-metrics-k8s-stack:
           telegram_configs:
             - api_url: "https://api.telegram.org"
               parse_mode: "HTML"
-              message: '{{ template "telegram.main" .}}'
+              message: '{{ template "telegram.default.message" .}}'
               chat_id: -1003698600231
               bot_token: "5864846746:AAFtELK-zE_oLvvN9dnXynBCxmPjZIcNQAU"
     inhibit_rules:
@@ -54,7 +45,31 @@ victoria-metrics-k8s-stack:
         equal:
           - cluster
           - namespace
-           
+
+  templateFiles:
+    template_1.tmpl: |-
+      {{ define "__yucca_text_alert_list" }}{{ range . }}
+      ---
+      🪪 <b>{{ .Labels.alertname }}</b>
+      {{- if .Annotations.summary }}
+      📝 {{ .Annotations.summary }}{{ end }}
+      {{- if .Annotations.description }}
+      📖 {{ .Annotations.description }}{{ end }}
+      🏷 Labels:
+      {{ range .Labels.SortedPairs }}  <i>{{ .Name }}</i>: <code>{{ .Value }}</code>
+      {{ end }}{{ end }}
+      {{ end }}
+
+      {{ define "telegram.yucca.message" }}
+      {{ if gt (len .Alerts.Firing) 0 }}
+      🔥 Alerts Firing 🔥
+      {{ template "__yucca_text_alert_list" .Alerts.Firing }}
+      {{ end }}
+      {{ if gt (len .Alerts.Resolved) 0 }}
+      ✅ Alerts Resolved ✅
+      {{ template "__yucca_text_alert_list" .Alerts.Resolved }}
+      {{ end }}
+      {{ end }}              
 
   vmalert:
     enabled: true
@@ -198,3 +213,30 @@ defaultRules:
   labels: {}
   annotations: {}
   additionalRuleLabels: {}
+
+alertmanager:
+  enabled: true
+  templateFiles:
+    template_1.tmpl: |-
+      {{ define "__yucca_text_alert_list" }}{{ range . }}
+      ---
+      🪪 <b>{{ .Labels.alertname }}</b>
+      {{- if .Annotations.summary }}
+      📝 {{ .Annotations.summary }}{{ end }}
+      {{- if .Annotations.description }}
+      📖 {{ .Annotations.description }}{{ end }}
+      🏷 Labels:
+      {{ range .Labels.SortedPairs }}  <i>{{ .Name }}</i>: <code>{{ .Value }}</code>
+      {{ end }}{{ end }}
+      {{ end }}
+
+      {{ define "telegram.yucca.message" }}
+      {{ if gt (len .Alerts.Firing) 0 }}
+      🔥 Alerts Firing 🔥
+      {{ template "__yucca_text_alert_list" .Alerts.Firing }}
+      {{ end }}
+      {{ if gt (len .Alerts.Resolved) 0 }}
+      ✅ Alerts Resolved ✅
+      {{ template "__yucca_text_alert_list" .Alerts.Resolved }}
+      {{ end }}
+      {{ end }}     
