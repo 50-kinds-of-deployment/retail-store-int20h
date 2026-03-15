@@ -14,7 +14,7 @@ spec:
   source:
     path: src/ui/chart
     repoURL: https://github.com/50-Kinds-of-deployment/retail-store-int20h.git
-    targetRevision: main
+    targetRevision: fix-stage
     helm:
       valueFiles:
         - /values/ui.yaml
