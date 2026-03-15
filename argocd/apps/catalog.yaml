@@ -14,7 +14,7 @@ spec:
   source:
     path: src/catalog/chart
     repoURL: https://github.com/50-Kinds-of-deployment/retail-store-int20h.git
-    targetRevision: fix-stage
+    targetRevision: main
     helm:
       valueFiles:
         - /values/catalog.yaml
