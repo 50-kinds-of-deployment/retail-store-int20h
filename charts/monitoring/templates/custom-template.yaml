@@ -1,4 +1,4 @@
-{{- if and .Values.alertmanager.enabled .Values.alertmanager.templateFiles }}
+{{- if and .Values.victoria-metrics-k8s-stack.alertmanager.enabled .Values.victoria-metrics-k8s-stack.alertmanager.templateFiles }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: {{ include "victoria-metrics-k8s-stack.name" $ }}-alertmanager
 {{ include "victoria-metrics-k8s-stack.labels" . | indent 4 }}
 data:
-{{- range $file, $template := .Values.alertmanager.templateFiles }}
+{{- range $file, $template := .Values.victoria-metrics-k8s-stack.alertmanager.templateFiles }}
   {{ $file }}: |-
      {{- $template | nindent 4 }}
 {{- end }}
