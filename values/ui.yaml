@@ -23,5 +23,5 @@ service:
 
 securityGroups:
   create: true
-  securityGroupIds:
-    - 'sg-05f3d57867664386a' # This is a placeholder, user needs to update or I will find it.
+  # securityGroupIds:
+  #   - 'sg-05f3d57867664386a' # This is a placeholder, user needs to update or I will find it.
