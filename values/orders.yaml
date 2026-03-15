@@ -12,8 +12,9 @@ app:
     database: 'orders'
 
     secret:
-      create: false
-      name: "orders-db"
+      name: 'orders-db'
+    postgres:
+      endpoint: ''
 
   messaging:
     provider: 'rabbitmq'
