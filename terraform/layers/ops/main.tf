@@ -52,12 +52,12 @@ module "retail_app_eks" {
 }
 
 resource "aws_eks_addon" "ebs_csi" {
-  cluster_name = module.retail_app_eks.eks_cluster_id
+  cluster_name = var.environment_name
   addon_name   = "aws-ebs-csi-driver"
 }
 
 resource "aws_eks_addon" "metrics_server" {
-  cluster_name = module.retail_app_eks.eks_cluster_id
+  cluster_name = var.environment_name
   addon_name   = "metrics-server"
 }
 
