@@ -90,6 +90,11 @@ app:
       name: orders-db
       username: orders
       password: ""
+      externalSecret:
+        enabled: false
+        secretStoreName: aws-secretsmanager
+        secretStoreKind: ClusterSecretStore
+        remoteKey: stage-retail-store-orders-db-credentials
 
   messaging:
     provider: 'in-memory'
