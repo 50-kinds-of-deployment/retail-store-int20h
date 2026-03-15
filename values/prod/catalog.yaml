@@ -10,7 +10,7 @@ app:
   persistence:
     provider: mysql
     mysql:
-      endpoint: "catalog-prod-mysql.catalog-prod.svc.cluster.local:3306"
+      endpoint: "catalog-prod-mysql:3306"
 
     secret:
       create: true
