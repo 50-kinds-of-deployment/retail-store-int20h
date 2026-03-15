@@ -1,0 +1,20 @@
+image:
+  repository: "696390945977.dkr.ecr.eu-central-1.amazonaws.com/cart"
+  tag: "1.0.0"
+
+serviceAccount:
+  annotations: {}
+
+opentelemetry:
+  enabled: true
+  instrumentation: "opentelemetry-operator-system/default-instrumentation"
+
+app:
+  persistence:
+    provider: dynamodb
+    dynamodb:
+      tableName: "carts"
+      createTable: true
+
+dynamodb:
+  create: true

@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: catalog-prod
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/foreground
+spec:
+  destination:
+    namespace: "catalog-prod"
+    server: https://kubernetes.default.svc
+  source:
+    path: src/catalog/chart
+    repoURL: https://github.com/50-Kinds-of-deployment/retail-store-int20h.git
+    targetRevision: main
+    helm:
+      valueFiles:
+        - /values/prod/catalog.yaml
+  project: default
+  syncPolicy:
+    automated:
+      enabled: true
+    syncOptions:
+      - CreateNamespace=true

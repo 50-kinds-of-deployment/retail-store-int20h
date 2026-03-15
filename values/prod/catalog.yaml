@@ -1,0 +1,23 @@
+image:
+  repository: "696390945977.dkr.ecr.eu-central-1.amazonaws.com/catalog"
+  tag: "1.0.0"
+
+opentelemetry:
+  enabled: true
+  instrumentation: "opentelemetry-operator-system/default-instrumentation"
+
+app:
+  persistence:
+    provider: mysql
+
+    secret:
+      create: true
+      name: "catalog-db"
+      username: "catalyst"
+
+mysql:
+  create: true
+
+securityGroups:
+  create: false
+  securityGroupIds: []

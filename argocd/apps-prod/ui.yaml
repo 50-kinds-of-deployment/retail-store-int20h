@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ui-prod
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/foreground
+spec:
+  destination:
+    namespace: "ui-prod"
+    server: https://kubernetes.default.svc
+  source:
+    path: src/ui/chart
+    repoURL: https://github.com/50-Kinds-of-deployment/retail-store-int20h.git
+    targetRevision: main
+    helm:
+      valueFiles:
+        - /values/prod/ui.yaml
+  project: default
+  syncPolicy:
+    automated:
+      enabled: true
+    syncOptions:
+      - CreateNamespace=true

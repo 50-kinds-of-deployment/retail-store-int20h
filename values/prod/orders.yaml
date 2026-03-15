@@ -1,0 +1,42 @@
+image:
+  repository: "696390945977.dkr.ecr.eu-central-1.amazonaws.com/orders"
+  tag: "1.0.0"
+
+opentelemetry:
+  enabled: true
+  instrumentation: "opentelemetry-operator-system/default-instrumentation"
+
+app:
+  persistence:
+    provider: "postgres"
+    database: "orders"
+
+    secret:
+      create: true
+      name: "orders-db"
+      username: "postgres"
+
+    postgres:
+      endpoint: ""
+
+  messaging:
+    provider: "rabbitmq"
+
+    rabbitmq:
+      addresses: []
+
+      secret:
+        create: true
+        name: "orders-rabbitmq"
+        username: "admin"
+        password: "admin"
+
+postgresql:
+  create: true
+
+rabbitmq:
+  create: true
+
+securityGroups:
+  create: false
+  securityGroupIds: []

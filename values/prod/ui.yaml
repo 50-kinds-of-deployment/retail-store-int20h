@@ -1,0 +1,21 @@
+image:
+  repository: "696390945977.dkr.ecr.eu-central-1.amazonaws.com/ui"
+  tag: "1.0.0"
+
+app:
+  endpoints:
+    catalog: http://catalog-prod.catalog-prod.svc:80
+    carts: http://carts-prod.carts-prod.svc:80
+    orders: http://orders-prod.orders-prod.svc:80
+    checkout: http://checkout-prod.checkout-prod.svc:80
+
+opentelemetry:
+  enabled: true
+  instrumentation: "opentelemetry-operator-system/default-instrumentation"
+
+service:
+  type: ClusterIP
+
+securityGroups:
+  create: false
+  securityGroupIds: []
