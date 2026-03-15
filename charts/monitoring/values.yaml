@@ -5,9 +5,76 @@ victoria-metrics-k8s-stack:
     crds:
       plain: true
   alertmanager:
-    enabled: false
+    enabled: true
+    config:
+      templates:
+        - "/etc/vm/configs/**/*.tmpl"
+      route:
+        group_by: ["alertname", "cluster", "service"]
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
+        receiver: "telega"
+      receivers:
+        - name: "telega"
+          telegram_configs:
+            - api_url: "https://api.telegram.org"
+              parse_mode: "HTML"
+              message: '{{ template "telegram.yucca.message" .}}'
+              chat_id: chat_id
+              bot_token: "bot_token"
+    inhibit_rules:
+      - target_matchers:
+          - severity=~"warning|info"
+        source_matchers:
+          - severity=critical
+        equal:
+          - cluster
+          - namespace
+          - alertname
+      - target_matchers:
+          - severity=info
+        source_matchers:
+          - severity=warning
+        equal:
+          - cluster
+          - namespace
+          - alertname
+      - target_matchers:
+          - severity=info
+        source_matchers:
+          - alertname=InfoInhibitor
+        equal:
+          - cluster
+          - namespace
+
+  templateFiles:
+    template_1.tmpl: |-
+      {{ define "__yucca_text_alert_list" }}{{ range . }}
+      ---
+      🪪 <b>{{ .Labels.alertname }}</b>
+      {{- if .Annotations.summary }}
+      📝 {{ .Annotations.summary }}{{ end }}
+      {{- if .Annotations.description }}
+      📖 {{ .Annotations.description }}{{ end }}
+      🏷 Labels:
+      {{ range .Labels.SortedPairs }}  <i>{{ .Name }}</i>: <code>{{ .Value }}</code>
+      {{ end }}{{ end }}
+      {{ end }}
+
+      {{ define "telegram.yucca.message" }}
+      {{ if gt (len .Alerts.Firing) 0 }}
+      🔥 Alerts Firing 🔥
+      {{ template "__yucca_text_alert_list" .Alerts.Firing }}
+      {{ end }}
+      {{ if gt (len .Alerts.Resolved) 0 }}
+      ✅ Alerts Resolved ✅
+      {{ template "__yucca_text_alert_list" .Alerts.Resolved }}
+      {{ end }}
+      {{ end }}              
+
   vmalert:
-    enabled: false
+    enabled: true
   grafana:
     plugins:
     - victoriametrics-logs-datasource
