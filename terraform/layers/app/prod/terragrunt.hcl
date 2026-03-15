@@ -10,6 +10,7 @@ inputs = {
   environment_name          = "prod-retail-store"
   state_env                 = "prod"
   bootstrap_state_env       = "stage"
+  resolve_ui_service_url    = false
   istio_enabled             = false
   opentelemetry_enabled     = false
   container_image_overrides = {}

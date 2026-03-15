@@ -49,3 +49,9 @@ variable "argocd_github_token" {
   sensitive   = true
   default     = ""
 }
+
+variable "resolve_ui_service_url" {
+  description = "Whether to query Kubernetes service ui for retail_app_url output"
+  type        = bool
+  default     = false
+}

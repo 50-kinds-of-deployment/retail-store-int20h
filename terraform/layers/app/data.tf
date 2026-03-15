@@ -36,6 +36,8 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 data "kubernetes_service" "ui_service" {
+  count = var.resolve_ui_service_url ? 1 : 0
+
   metadata {
     name      = "ui"
     namespace = "ui"
