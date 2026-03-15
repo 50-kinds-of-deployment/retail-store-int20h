@@ -117,7 +117,7 @@ victoria-metrics-k8s-stack:
       kubernetes-views-pods:
         enabled: true
       node-exporter-full:
-        enabled: true
+        enabled: false
       victoriametrics-backupmanager:
         enabled: false
       victoriametrics-cluster:
