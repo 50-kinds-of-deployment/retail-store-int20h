@@ -17,7 +17,7 @@ spec:
     targetRevision: main
     helm:
       valueFiles:
-        - /values/prod/catalog.yaml
+        - ../../../values/prod/catalog.yaml
   project: default
   syncPolicy:
     automated:

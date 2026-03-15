@@ -17,7 +17,7 @@ spec:
     targetRevision: main
     helm:
       valueFiles:
-        - /values/prod/checkout.yaml
+        - ../../../values/prod/checkout.yaml
   project: default
   syncPolicy:
     automated:
