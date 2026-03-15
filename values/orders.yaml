@@ -25,3 +25,8 @@ app:
       secret:
         create: false
         name: "orders-rabbitmq"
+
+securityGroups:
+  create: true
+  securityGroupIds:
+    - 'sg-0db2999eff856db73'
