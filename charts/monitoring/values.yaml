@@ -74,6 +74,8 @@ victoria-metrics-k8s-stack:
         requests:
           cpu: 100m
           memory: 128Mi
+      storage:
+        storageClassName: gp2
 
 
 victoria-logs-single:
@@ -83,6 +85,7 @@ victoria-logs-single:
     retentionPeriod: 7d
     persistentVolume:
       size: 10Gi
+      storageClassName: gp2
 
 victoria-logs-collector:
   enabled: true
