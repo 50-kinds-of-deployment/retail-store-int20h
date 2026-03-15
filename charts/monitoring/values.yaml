@@ -178,3 +178,40 @@ externalDashboards:
       enabled: true
     hpa:
       enabled: true
+
+
+defaultRules:
+  create: true
+  rules:
+    network: false
+    general: false
+    kubeStateMetrics: false
+    alertmanager: false
+
+    main: true
+    
+    k8s: false
+    etcd: false
+    kubeApiserver: false
+    kubeApiserverAvailability: false
+    kubeApiserverBurnrate: false
+    kubeApiserverHistogram: false
+    kubeApiserverSlos: false
+    kubelet: false
+    kubePrometheusGeneral: false
+    kubePrometheusNodeRecording: false
+    kubernetesApps: false
+    kubernetesResources: false
+    kubernetesStorage: false
+    kubernetesSystem: false
+    kubeScheduler: false
+    node: false
+    vmagent: false
+    vmsingle: false
+    vmhealth: false
+
+  runbookUrl: https://runbooks.prometheus-operator.dev/runbooks
+  appNamespacesTarget: ".*"
+  labels: {}
+  annotations: {}
+  additionalRuleLabels: {}
