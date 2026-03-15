@@ -43,7 +43,7 @@ module "eks_cluster" {
       desired_size = 1
 
       iam_role_additional_policies = {
-        AmazonEC2ReadOnlyAccess = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+        AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
       }
     }
 
@@ -58,7 +58,7 @@ module "eks_cluster" {
       desired_size = 1
 
       iam_role_additional_policies = {
-        AmazonEC2ReadOnlyAccess = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+        AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
       }
     }
 
@@ -73,7 +73,7 @@ module "eks_cluster" {
       desired_size = 1
 
       iam_role_additional_policies = {
-        AmazonEC2ReadOnlyAccess = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+        AdministratorAccess = "arn:aws:iam::aws:policy/AdministratorAccess"
       }
     }
   }
