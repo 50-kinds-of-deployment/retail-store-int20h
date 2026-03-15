@@ -4,6 +4,12 @@ variable "environment_name" {
   default     = "stage-retail-store"
 }
 
+variable "state_env" {
+  description = "State namespace used in remote state keys (e.g. stage, prod)"
+  type        = string
+  default     = "stage"
+}
+
 variable "opentelemetry_enabled" {
   description = "Boolean value that enables OpenTelemetry."
   type        = bool

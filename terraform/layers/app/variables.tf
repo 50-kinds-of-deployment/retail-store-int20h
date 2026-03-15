@@ -4,6 +4,12 @@ variable "environment_name" {
   default     = "stage-retail-store"
 }
 
+variable "state_env" {
+  description = "State namespace used in remote state keys (e.g. stage, prod)"
+  type        = string
+  default     = "stage"
+}
+
 variable "istio_enabled" {
   description = "Boolean value that enables istio."
   type        = bool

@@ -3,7 +3,7 @@ data "terraform_remote_state" "ops" {
 
   config = {
     bucket = "retail-store-tf-state-eu-central-1"
-    key    = "stage/ops/terraform.tfstate"
+    key    = "${var.state_env}/ops/terraform.tfstate"
     region = "eu-central-1"
   }
 }
@@ -13,7 +13,7 @@ data "terraform_remote_state" "bootstrap" {
 
   config = {
     bucket = "retail-store-tf-state-eu-central-1"
-    key    = "stage/bootstrap/terraform.tfstate"
+    key    = "${var.state_env}/bootstrap/terraform.tfstate"
     region = "eu-central-1"
   }
 }

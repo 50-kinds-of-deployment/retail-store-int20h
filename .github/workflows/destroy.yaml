@@ -1,9 +1,17 @@
 name: Destroy Infrastructure
-run-name: Destroy ${{ inputs.layer }} layer
+run-name: Destroy ${{ inputs.environment }} / ${{ inputs.layer }}
 
 on:
   workflow_dispatch:
     inputs:
+      environment:
+        description: 'Environment to destroy from'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - stage
+          - prod
 
       layer:
         description: 'Layer to destroy'
@@ -22,11 +30,12 @@ permissions:
 jobs:
   destroy:
     runs-on: ubuntu-24.04
-    environment: stage
+    environment: ${{ inputs.environment }}
     env:
       TF_IN_AUTOMATION: true
+      TF_VAR_argocd_github_token: ${{ secrets.ARGOCD_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -35,21 +44,24 @@ jobs:
           aws-region: eu-central-1
 
       - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: latest
 
       - name: Set working directory
         id: workdir
         run: |
-          if [ "${{ inputs.layer }}" == "app" ]; then
-            echo "dir=./terraform/layers/app" >> $GITHUB_OUTPUT
-          else
-            echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
-          fi
+          echo "dir=./terraform/live/${{ inputs.environment }}/${{ inputs.layer }}" >> $GITHUB_OUTPUT
 
-      - name: Terraform Init
-        run: terraform init -input=false
+      - name: Terragrunt Init
+        run: terragrunt init -input=false
         working-directory: ${{ steps.workdir.outputs.dir }}
 
-      - name: Terraform Destroy
+      - name: Terragrunt Destroy
         working-directory: ${{ steps.workdir.outputs.dir }}
         run: |
-          terraform destroy -auto-approve -input=false
+          terragrunt destroy -auto-approve -input=false

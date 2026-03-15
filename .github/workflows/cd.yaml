@@ -3,6 +3,10 @@ name: CD - Layer Deployment Workflow
 on:
   workflow_call:
     inputs:
+      environment:
+        description: 'Environment name to deploy (stage, prod)'
+        required: true
+        type: string
       layer:
         description: 'Layer name to deploy (bootstrap, ops, app)'
         required: true
@@ -15,6 +19,7 @@ jobs:
     uses: ./.github/workflows/terraform-plan.yaml
     secrets: inherit
     with:
+      environment: ${{ inputs.environment }}
       layer: ${{ inputs.layer }}
 
   apply:
@@ -25,4 +30,5 @@ jobs:
     uses: ./.github/workflows/terraform-apply.yaml
     secrets: inherit
     with:
+      environment: ${{ inputs.environment }}
       layer: ${{ inputs.layer }}
