@@ -17,13 +17,13 @@ app:
       username: "postgres"
 
     postgres:
-      endpoint: "orders-prod-postgresql:5432"
+      endpoint: "orders-prod-postgresql.orders-prod.svc.cluster.local:5432"
 
   messaging:
     provider: "rabbitmq"
 
     rabbitmq:
-      addresses: ["amqp://orders-prod-rabbitmq:5672"]
+      addresses: ["amqp://orders-prod-rabbitmq.orders-prod.svc.cluster.local:5672"]
 
       secret:
         create: true
