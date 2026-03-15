@@ -215,3 +215,30 @@ defaultRules:
   labels: {}
   annotations: {}
   additionalRuleLabels: {}
+
+alertmanager:
+  enabled: true
+  templateFiles:
+    template_1.tmpl: |-
+      {{ define "__yucca_text_alert_list" }}{{ range . }}
+      ---
+      🪪 <b>{{ .Labels.alertname }}</b>
+      {{- if .Annotations.summary }}
+      📝 {{ .Annotations.summary }}{{ end }}
+      {{- if .Annotations.description }}
+      📖 {{ .Annotations.description }}{{ end }}
+      🏷 Labels:
+      {{ range .Labels.SortedPairs }}  <i>{{ .Name }}</i>: <code>{{ .Value }}</code>
+      {{ end }}{{ end }}
+      {{ end }}
+
+      {{ define "telegram.yucca.message" }}
+      {{ if gt (len .Alerts.Firing) 0 }}
+      🔥 Alerts Firing 🔥
+      {{ template "__yucca_text_alert_list" .Alerts.Firing }}
+      {{ end }}
+      {{ if gt (len .Alerts.Resolved) 0 }}
+      ✅ Alerts Resolved ✅
+      {{ template "__yucca_text_alert_list" .Alerts.Resolved }}
+      {{ end }}
+      {{ end }}     
