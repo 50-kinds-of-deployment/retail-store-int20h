@@ -6,6 +6,12 @@ opentelemetry:
   enabled: true
   instrumentation: "opentelemetry-operator-system/default-instrumentation"
 
+postgresql:
+  create: false
+
+rabbitmq:
+  create: false
+
 app:
   persistence:
     provider: 'postgres'
