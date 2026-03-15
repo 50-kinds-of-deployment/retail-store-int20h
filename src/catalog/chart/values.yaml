@@ -92,7 +92,7 @@ app:
       password: ""
 
 mysql:
-  create: false
+  create: true
 
   image:
     repository: public.ecr.aws/docker/library/mysql

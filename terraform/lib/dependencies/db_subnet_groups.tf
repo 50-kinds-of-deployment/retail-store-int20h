@@ -1,4 +1,6 @@
 resource "aws_db_subnet_group" "catalog" {
+  count = var.enable_rds ? 1 : 0
+
   name       = "${var.environment_name}-catalog-subnet"
   subnet_ids = var.subnet_ids
 
@@ -6,6 +8,8 @@ resource "aws_db_subnet_group" "catalog" {
 }
 
 resource "aws_db_subnet_group" "orders" {
+  count = var.enable_rds ? 1 : 0
+
   name       = "${var.environment_name}-orders-subnet"
   subnet_ids = var.subnet_ids
 

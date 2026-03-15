@@ -1,75 +1,75 @@
 output "catalog_db_endpoint" {
   description = "Hostname (without port) for the catalog database"
-  value       = split(":", module.catalog_rds.db_instance_endpoint)[0]
+  value       = var.enable_rds ? split(":", module.catalog_rds[0].db_instance_endpoint)[0] : null
 }
 
 output "catalog_db_database_name" {
   description = "Database name for the catalog database"
-  value       = "catalog"
+  value       = var.enable_rds ? "catalog" : null
 }
 
 output "catalog_db_master_password" {
   description = "Master password for the catalog database"
-  value       = random_string.catalog_db_master.result
+  value       = var.enable_rds ? random_string.catalog_db_master[0].result : null
   sensitive   = true
 }
 
 output "catalog_db_master_username" {
   description = "Master username for the catalog database"
-  value       = "catalyst"
+  value       = var.enable_rds ? "catalyst" : null
   sensitive   = true
 }
 
 output "catalog_db_port" {
   description = "Port for the catalog database"
-  value       = module.catalog_rds.db_instance_port
+  value       = var.enable_rds ? module.catalog_rds[0].db_instance_port : null
 }
 
 output "catalog_db_reader_endpoint" {
   description = "Hostname (without port) for the catalog database (read-only)"
-  value       = split(":", module.catalog_rds.db_instance_endpoint)[0]
+  value       = var.enable_rds ? split(":", module.catalog_rds[0].db_instance_endpoint)[0] : null
 }
 
 output "catalog_db_arn" {
   description = "ARN for the catalog database"
-  value       = module.catalog_rds.db_instance_arn
+  value       = var.enable_rds ? module.catalog_rds[0].db_instance_arn : null
 }
 
 output "orders_db_endpoint" {
   description = "Hostname (without port) for the orders database"
-  value       = split(":", module.orders_rds.db_instance_endpoint)[0]
+  value       = var.enable_rds ? split(":", module.orders_rds[0].db_instance_endpoint)[0] : null
 }
 
 output "orders_db_database_name" {
   description = "Database name for the orders database"
-  value       = "orders"
+  value       = var.enable_rds ? "orders" : null
 }
 
 output "orders_db_master_password" {
   description = "Master password for the orders database"
-  value       = random_string.orders_db_master.result
+  value       = var.enable_rds ? random_string.orders_db_master[0].result : null
   sensitive   = true
 }
 
 output "orders_db_master_username" {
   description = "Master username for the orders database"
-  value       = "postgres"
+  value       = var.enable_rds ? "postgres" : null
   sensitive   = true
 }
 
 output "orders_db_port" {
   description = "Port for the orders database"
-  value       = module.orders_rds.db_instance_port
+  value       = var.enable_rds ? module.orders_rds[0].db_instance_port : null
 }
 
 output "orders_db_reader_endpoint" {
   description = "Hostname (without port) for the orders database (read-only)"
-  value       = split(":", module.orders_rds.db_instance_endpoint)[0]
+  value       = var.enable_rds ? split(":", module.orders_rds[0].db_instance_endpoint)[0] : null
 }
 
 output "orders_db_arn" {
   description = "ARN for the orders database"
-  value       = module.orders_rds.db_instance_arn
+  value       = var.enable_rds ? module.orders_rds[0].db_instance_arn : null
 }
 
 output "carts_dynamodb_table_arn" {
@@ -134,12 +134,12 @@ output "checkout_elasticache_port" {
 }
 
 output "catalog_db_secret_arn" {
-  value       = aws_secretsmanager_secret.catalog_db_credentials.arn
+  value       = var.enable_rds ? aws_secretsmanager_secret.catalog_db_credentials[0].arn : null
   description = "ARN of the AWS Secrets Manager secret for Catalog DB credentials"
 }
 
 output "orders_db_secret_arn" {
-  value       = aws_secretsmanager_secret.orders_db_credentials.arn
+  value       = var.enable_rds ? aws_secretsmanager_secret.orders_db_credentials[0].arn : null
   description = "ARN of the AWS Secrets Manager secret for Orders DB credentials"
 }
 

@@ -68,6 +68,7 @@ module "dependencies" {
 
   environment_name = var.environment_name
   tags             = local.tags
+  enable_rds       = var.state_env == "stage"
 
   vpc_id     = module.vpc.inner.vpc_id
   subnet_ids = module.vpc.inner.private_subnets

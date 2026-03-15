@@ -1,4 +1,6 @@
 module "orders_rds" {
+  count = var.enable_rds ? 1 : 0
+
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 6.0"
 
@@ -18,7 +20,7 @@ module "orders_rds" {
 
   db_name  = "orders"
   username = "postgres"
-  password = random_string.orders_db_master.result
+  password = random_string.orders_db_master[0].result
   port     = 5432
 
   manage_master_user_password = false
@@ -36,11 +38,15 @@ module "orders_rds" {
 }
 
 resource "random_string" "orders_db_master" {
+  count = var.enable_rds ? 1 : 0
+
   length  = 10
   special = false
 }
 
 resource "aws_secretsmanager_secret" "orders_db_credentials" {
+  count = var.enable_rds ? 1 : 0
+
   name        = "${var.environment_name}-orders-db-credentials"
   description = "Credentials for the Orders database"
 
@@ -49,11 +55,13 @@ resource "aws_secretsmanager_secret" "orders_db_credentials" {
 }
 
 resource "aws_secretsmanager_secret_version" "orders_db_credentials" {
-  secret_id = aws_secretsmanager_secret.orders_db_credentials.id
+  count = var.enable_rds ? 1 : 0
+
+  secret_id = aws_secretsmanager_secret.orders_db_credentials[0].id
   secret_string = jsonencode({
     username = "postgres"
-    password = random_string.orders_db_master.result
-    host     = module.orders_rds.db_instance_endpoint
+    password = random_string.orders_db_master[0].result
+    host     = module.orders_rds[0].db_instance_endpoint
     port     = 5432
   })
 }
