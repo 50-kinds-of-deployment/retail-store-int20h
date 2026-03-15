@@ -55,7 +55,7 @@ parse_params() {
   quiet=false
   container=false
   target='http://localhost:8888'
-  duration='0'
+  duration='60'
   vus='1'
   network='bridge'
   output=''

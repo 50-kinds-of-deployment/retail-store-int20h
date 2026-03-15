@@ -67,6 +67,13 @@ metrics:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8080"
     prometheus.io/path: "/metrics"
+  vmScrape:
+    enabled: true
+    interval: 15s
+    relabelConfigs:
+      - action: replace
+        targetLabel: service_name
+        replacement: catalog-service    
 
 configMap:
   create: true
