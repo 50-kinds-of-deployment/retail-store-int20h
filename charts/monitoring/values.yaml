@@ -75,8 +75,6 @@ victoria-metrics-k8s-stack:
 
   vmalert:
     enabled: true
-    templateFiles:
-      {}    
   grafana:
     plugins:
     - victoriametrics-logs-datasource
