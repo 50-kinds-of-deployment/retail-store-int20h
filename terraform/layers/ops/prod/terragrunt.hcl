@@ -9,6 +9,7 @@ terraform {
 inputs = {
   environment_name      = "prod-retail-store"
   state_env             = "prod"
+  bootstrap_state_env   = "stage"
   opentelemetry_enabled = true
   istio_enabled         = false
 }

@@ -50,7 +50,11 @@ jobs:
       - name: Set working directory
         id: workdir
         run: |
-          echo "dir=./terraform/layers/${{ inputs.layer }}/${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.layer }}" = "bootstrap" ]; then
+            echo "dir=./terraform/layers/bootstrap" >> $GITHUB_OUTPUT
+          else
+            echo "dir=./terraform/layers/${{ inputs.layer }}/${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          fi
         working-directory: .
 
       - name: Terragrunt Init

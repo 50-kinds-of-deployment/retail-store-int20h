@@ -10,6 +10,12 @@ variable "state_env" {
   default     = "stage"
 }
 
+variable "bootstrap_state_env" {
+  description = "State namespace used for the shared bootstrap state"
+  type        = string
+  default     = "stage"
+}
+
 variable "istio_enabled" {
   description = "Boolean value that enables istio."
   type        = bool

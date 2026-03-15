@@ -8,7 +8,7 @@ remote_state {
   backend = "s3"
   config = {
     bucket  = local.state_bucket
-    key     = "${path_relative_to_include()}/${local.layer_name}/terraform.tfstate"
+    key     = "stage/${local.layer_name}/terraform.tfstate"
     region  = local.aws_region
     encrypt = true
   }
