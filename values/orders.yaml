@@ -18,7 +18,10 @@ app:
     database: 'orders'
 
     secret:
+      create: false
       name: 'orders-db'
+      externalSecret:
+        enabled: true
     postgres:
       endpoint: ''
 

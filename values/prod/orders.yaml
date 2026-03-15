@@ -12,10 +12,12 @@ app:
     database: "orders"
 
     secret:
-      create: true
+      create: false
       name: "orders-db"
       username: "postgres"
       password: "postgres"
+      externalSecret:
+        enabled: true
       
 
     postgres:
