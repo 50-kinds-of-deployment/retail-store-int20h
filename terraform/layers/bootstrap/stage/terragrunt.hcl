@@ -2,6 +2,10 @@ include "root" {
   path = find_in_parent_folders("root.hcl")
 }
 
+terraform {
+  source = "${get_repo_root()}/terraform//layers/bootstrap"
+}
+
 inputs = {
   environment_name          = "stage-retail-store"
   gh_oidc_sub               = "repo:50-kinds-of-deployment/retail-store-int20h:*"

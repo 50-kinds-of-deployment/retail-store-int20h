@@ -1,12 +1,7 @@
 locals {
-  aws_region     = "eu-central-1"
-  state_bucket   = "retail-store-tf-state-eu-central-1"
-  terraform_root = abspath("${get_terragrunt_dir()}/../..")
-  layer_name     = basename(get_terragrunt_dir())
-}
-
-terraform {
-  source = "${local.terraform_root}//layers/${local.layer_name}"
+  aws_region   = "eu-central-1"
+  state_bucket = "retail-store-tf-state-eu-central-1"
+  layer_name   = basename(dirname(find_in_parent_folders("root.hcl")))
 }
 
 remote_state {
