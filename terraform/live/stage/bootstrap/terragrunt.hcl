@@ -3,7 +3,7 @@ include "root" {
 }
 
 terraform {
-  source = "../../../layers/bootstrap"
+  source = "${include.root.locals.terraform_root}//layers/bootstrap"
 }
 
 inputs = {
