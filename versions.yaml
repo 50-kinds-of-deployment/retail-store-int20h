@@ -1,7 +1,7 @@
 ui:
   tag: 1.0.0
 cart:
-  tag: 0.0.0
+  tag: 1.0.0
 catalog:
   tag: 1.0.0
 checkout:
