@@ -1,10 +1,5 @@
 include "root" {
-  path   = find_in_parent_folders("root.hcl")
-  expose = true
-}
-
-terraform {
-  source = "${include.root.locals.terraform_root}//layers/app"
+  path = find_in_parent_folders("root.hcl")
 }
 
 inputs = {

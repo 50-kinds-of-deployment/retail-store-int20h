@@ -50,7 +50,7 @@ jobs:
       - name: Set working directory
         id: workdir
         run: |
-          echo "dir=./terraform/live/${{ inputs.environment }}/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+          echo "dir=./terraform/layers/${{ inputs.layer }}/${{ inputs.environment }}" >> $GITHUB_OUTPUT
         working-directory: .
 
       - name: Terragrunt Init
