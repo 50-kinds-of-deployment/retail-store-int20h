@@ -2,14 +2,14 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
-  name: {{ include "service.fullname" . }}
+  name: {{ include "ui.fullname" . }}
   labels:
-    {{- include "service.labels" . | nindent 4 }}
+    {{- include "ui.labels" . | nindent 4 }}
     managed-by: victoriametrics-operator
 spec:
   selector:
     matchLabels:
-      {{- include "service.selectorLabels" . | nindent 6 }}
+      {{- include "ui.selectorLabels" . | nindent 6 }}
   endpoints:
     - port: {{ .Values.metrics.vmScrape.servicePortName | default "http" }}
       path: {{ .Values.metrics.vmScrape.path | default (index .Values.metrics.podAnnotations "prometheus.io/path") | default "/metrics" }}
