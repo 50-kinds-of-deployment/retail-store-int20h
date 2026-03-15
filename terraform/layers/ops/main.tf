@@ -37,7 +37,7 @@ module "retail_app_eks" {
   providers = {
     kubernetes.cluster = kubernetes.cluster
     kubernetes.addons  = kubernetes
-    helm = helm
+    helm               = helm
   }
 
   environment_name      = var.environment_name
@@ -148,6 +148,54 @@ resource "aws_security_group" "orders" {
 resource "aws_security_group" "checkout" {
   name        = "${var.environment_name}-checkout"
   description = "Security group for checkout component"
+  vpc_id      = module.vpc.inner.vpc_id
+
+  ingress {
+    description = "Allow inbound HTTP API traffic"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc.inner.vpc_cidr_block]
+  }
+
+  ingress {
+    description = "Allow inbound Istio healthchecks"
+    from_port   = 15020
+    to_port     = 15021
+    protocol    = "tcp"
+    cidr_blocks = [module.vpc.inner.vpc_cidr_block]
+  }
+
+  ingress {
+    description = "Allow all TCP from VPC"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  ingress {
+    description     = "Allow traffic from UI"
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ui.id]
+  }
+
+  egress {
+    description = "Allow all egress"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.tags
+}
+
+resource "aws_security_group" "ui" {
+  name        = "${var.environment_name}-ui"
+  description = "Security group for ui component"
   vpc_id      = module.vpc.inner.vpc_id
 
   ingress {

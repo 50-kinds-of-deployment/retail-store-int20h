@@ -20,3 +20,8 @@ service:
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
     service.beta.kubernetes.io/aws-load-balancer-attributes: "load_balancing.cross_zone.enabled=true"
+
+securityGroups:
+  create: true
+  securityGroupIds:
+    - 'sg-05f3d57867664386a' # This is a placeholder, user needs to update or I will find it.

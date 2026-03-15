@@ -73,6 +73,7 @@ output "mq_password" {
 output "catalog_sg_id" { value = aws_security_group.catalog.id }
 output "checkout_sg_id" { value = aws_security_group.checkout.id }
 output "orders_sg_id" { value = aws_security_group.orders.id }
+output "ui_sg_id" { value = aws_security_group.ui.id }
 
 output "catalog_db_secret_arn" { value = module.dependencies.catalog_db_secret_arn }
 output "orders_db_secret_arn" { value = module.dependencies.orders_db_secret_arn }
