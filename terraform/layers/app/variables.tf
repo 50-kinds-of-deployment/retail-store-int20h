@@ -53,7 +53,7 @@ variable "argocd_github_token" {
 variable "enable_external_secrets_irsa_annotation" {
   description = "Whether to annotate external-secrets service account with IRSA role"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "resolve_ui_service_url" {
