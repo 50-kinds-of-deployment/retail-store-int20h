@@ -104,7 +104,7 @@ app:
         password: ""
 
 postgresql:
-  create: false
+  create: true
 
   image:
     repository: public.ecr.aws/docker/library/postgres
@@ -133,7 +133,7 @@ postgresql:
     # storageClass: gp2
 
 rabbitmq:
-  create: false
+  create: true
 
   image:
     repository: "public.ecr.aws/docker/library/rabbitmq"

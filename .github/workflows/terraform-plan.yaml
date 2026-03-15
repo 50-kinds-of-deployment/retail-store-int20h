@@ -4,9 +4,13 @@ on:
   workflow_call:
     outputs:
       plan_exitcode:
-        description: "The exit code of the terraform plan command"
+        description: "The exit code of the terragrunt plan command"
         value: ${{ jobs.plan.outputs.plan_exitcode }}
     inputs:
+      environment:
+        description: 'Environment name to plan (stage, prod)'
+        required: true
+        type: string
       layer:
         description: 'Layer name to plan (bootstrap, ops, app)'
         required: true
@@ -20,9 +24,6 @@ permissions:
 jobs:
   plan:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: ./terraform/layers/${{ inputs.layer }}
     env:
       TF_IN_AUTOMATION: true
       TF_VAR_argocd_github_token: ${{ secrets.ARGOCD_TOKEN }}
@@ -41,27 +42,30 @@ jobs:
         with:
           terraform_wrapper: false
 
-      - name: Set working directory for app layer
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: latest
+
+      - name: Set working directory
         id: workdir
         run: |
-          if [ "${{ inputs.layer }}" == "app" ]; then
-            echo "dir=./terraform/layers/app" >> $GITHUB_OUTPUT
-            # In our current structure, environments aren't directory-based,
-            # but this structure is left here mapping to what was requested.
+          if [ "${{ inputs.layer }}" = "bootstrap" ]; then
+            echo "dir=./terraform/layers/bootstrap" >> $GITHUB_OUTPUT
           else
-            echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+            echo "dir=./terraform/layers/${{ inputs.layer }}/${{ inputs.environment }}" >> $GITHUB_OUTPUT
           fi
         working-directory: .
 
-      - name: Terraform Init
-        run: terraform init -input=false
+      - name: Terragrunt Init
+        run: terragrunt init -input=false
         working-directory: ${{ steps.workdir.outputs.dir }}
 
-      - name: Terraform Validate
-        run: terraform validate
+      - name: Terragrunt Validate
+        run: terragrunt validate
         working-directory: ${{ steps.workdir.outputs.dir }}
 
-      - name: Terraform Plan
+      - name: Terragrunt Plan
         id: tf_plan
         working-directory: ${{ steps.workdir.outputs.dir }}
         run: |
@@ -69,23 +73,23 @@ jobs:
 
           PLAN_ARGS="-detailed-exitcode -input=false -out=$PWD/tfplan"    
 
-          terraform plan $PLAN_ARGS
+          terragrunt plan $PLAN_ARGS
           exitcode=$?
           echo "plan_exitcode=$exitcode" >> $GITHUB_OUTPUT
           
-          # Terraform plan -detailed-exitcode returns:
+          # Terragrunt (Terraform plan) -detailed-exitcode returns:
           # 0 = Succeeded, diff is empty (no changes)
           # 1 = Errored
           # 2 = Succeeded, there is a diff
           if [ $exitcode -eq 1 ]; then
             exit 1
           fi
-          terraform show -no-color $PWD/tfplan > $PWD/tfplan.txt
+          terragrunt show -no-color $PWD/tfplan > $PWD/tfplan.txt
 
       - name: Archive plan artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: terraform-plan-${{ inputs.layer }}
+          name: terragrunt-plan-${{ inputs.environment }}-${{ inputs.layer }}
           path: |
             ${{ steps.workdir.outputs.dir }}/tfplan
             ${{ steps.workdir.outputs.dir }}/tfplan.txt

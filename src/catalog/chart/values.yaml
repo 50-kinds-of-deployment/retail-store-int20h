@@ -82,7 +82,7 @@ configMap:
 app:
   persistence:
     provider: in-memory
-    endpoint: ""
+    endpoint: "catalog-prod-mysql.catalog-prod.svc.cluster.local:3306"
     database: "catalog"
 
     secret:
@@ -92,7 +92,7 @@ app:
       password: ""
 
 mysql:
-  create: false
+  create: true
 
   image:
     repository: public.ecr.aws/docker/library/mysql

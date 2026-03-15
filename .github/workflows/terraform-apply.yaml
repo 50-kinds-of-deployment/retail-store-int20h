@@ -3,6 +3,10 @@ name: Terraform Apply
 on:
   workflow_call:
     inputs:
+      environment:
+        description: 'Environment name to apply (stage, prod)'
+        required: true
+        type: string
       layer:
         description: 'Layer name to apply (bootstrap, ops, app)'
         required: true
@@ -16,10 +20,7 @@ permissions:
 jobs:
   apply:
     runs-on: ubuntu-24.04
-    environment: stage
-    defaults:
-      run:
-        working-directory: ./terraform/layers/${{ inputs.layer }}
+    environment: ${{ inputs.environment }}
     env:
       TF_IN_AUTOMATION: true
       TF_VAR_argocd_github_token: ${{ secrets.ARGOCD_TOKEN }}
@@ -33,26 +34,33 @@ jobs:
           aws-region: eu-central-1
 
       - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: latest
 
       - name: Set working directory
         id: workdir
         run: |
-          if [ "${{ inputs.layer }}" == "app" ]; then
-            echo "dir=./terraform/layers/app" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.layer }}" = "bootstrap" ]; then
+            echo "dir=./terraform/layers/bootstrap" >> $GITHUB_OUTPUT
           else
-            echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+            echo "dir=./terraform/layers/${{ inputs.layer }}/${{ inputs.environment }}" >> $GITHUB_OUTPUT
           fi
         working-directory: .
 
       - uses: actions/download-artifact@v4
         with:
-          name: terraform-plan-${{ inputs.layer }}
+          name: terragrunt-plan-${{ inputs.environment }}-${{ inputs.layer }}
           path: ${{ steps.workdir.outputs.dir }}
 
-      - name: Terraform Init
-        run: terraform init -input=false
+      - name: Terragrunt Init
+        run: terragrunt init -input=false
         working-directory: ${{ steps.workdir.outputs.dir }}
 
-      - name: Terraform Apply
-        run: terraform apply -input=false $PWD/tfplan
+      - name: Terragrunt Apply
+        run: terragrunt apply -input=false $PWD/tfplan
         working-directory: ${{ steps.workdir.outputs.dir }}

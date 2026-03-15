@@ -39,3 +39,9 @@ variable "allowed_security_group_ids" {
   default     = []
   description = "List of additional allowed security group IDs"
 }
+
+variable "enable_rds" {
+  type        = bool
+  default     = true
+  description = "Whether to create RDS databases and related DB secrets"
+}

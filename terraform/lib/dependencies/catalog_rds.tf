@@ -1,4 +1,6 @@
 module "catalog_rds" {
+  count = var.enable_rds ? 1 : 0
+
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 6.0"
 
@@ -18,7 +20,7 @@ module "catalog_rds" {
 
   db_name                     = "catalog"
   username                    = "catalyst"
-  password                    = random_string.catalog_db_master.result
+  password                    = random_string.catalog_db_master[0].result
   port                        = 3306
   manage_master_user_password = false
   vpc_security_group_ids      = [var.catalog_security_group_id]
@@ -35,11 +37,15 @@ module "catalog_rds" {
 }
 
 resource "random_string" "catalog_db_master" {
+  count = var.enable_rds ? 1 : 0
+
   length  = 10
   special = false
 }
 
 resource "aws_secretsmanager_secret" "catalog_db_credentials" {
+  count = var.enable_rds ? 1 : 0
+
   name        = "${var.environment_name}-catalog-db-credentials"
   description = "Credentials for the Catalog database"
 
@@ -48,11 +54,13 @@ resource "aws_secretsmanager_secret" "catalog_db_credentials" {
 }
 
 resource "aws_secretsmanager_secret_version" "catalog_db_credentials" {
-  secret_id = aws_secretsmanager_secret.catalog_db_credentials.id
+  count = var.enable_rds ? 1 : 0
+
+  secret_id = aws_secretsmanager_secret.catalog_db_credentials[0].id
   secret_string = jsonencode({
     username = "catalyst"
-    password = random_string.catalog_db_master.result
-    host     = module.catalog_rds.db_instance_endpoint
+    password = random_string.catalog_db_master[0].result
+    host     = module.catalog_rds[0].db_instance_endpoint
     port     = 3306
   })
 }

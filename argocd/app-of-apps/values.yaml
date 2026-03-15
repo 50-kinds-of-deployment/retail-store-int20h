@@ -1,0 +1,8 @@
+appOfApps:
+  name: app-of-apps
+  namespace: argocd
+  project: default
+  repoURL: https://github.com/50-kinds-of-deployment/retail-store-int20h.git
+  targetRevision: main
+  path: argocd/apps
+  destinationServer: https://kubernetes.default.svc

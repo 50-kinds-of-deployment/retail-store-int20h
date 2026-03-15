@@ -9,12 +9,16 @@ resource "aws_iam_policy" "external_secrets" {
       {
         Effect = "Allow"
         Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
-        Resource = [
-          aws_secretsmanager_secret.catalog_db_credentials.arn,
-          aws_secretsmanager_secret.orders_db_credentials.arn,
-          aws_secretsmanager_secret.mq_credentials.arn,
-          aws_secretsmanager_secret.checkout_redis_credentials.arn
-        ]
+        Resource = concat(
+          var.enable_rds ? [
+            aws_secretsmanager_secret.catalog_db_credentials[0].arn,
+            aws_secretsmanager_secret.orders_db_credentials[0].arn
+          ] : [],
+          [
+            aws_secretsmanager_secret.mq_credentials.arn,
+            aws_secretsmanager_secret.checkout_redis_credentials.arn
+          ]
+        )
       }
     ]
   })

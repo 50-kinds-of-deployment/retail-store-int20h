@@ -4,6 +4,14 @@ run-name: Deploy infrastructure
 on:
   workflow_dispatch:
     inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        default: "stage"
+        options:
+          - stage
+          - prod
       layer:
         description: 'Layer name to deploy'
         required: true
@@ -26,6 +34,7 @@ jobs:
     uses: ./.github/workflows/cd.yaml
     secrets: inherit
     with:
+      environment: ${{ inputs.environment }}
       layer: bootstrap
 
   ops:
@@ -35,6 +44,7 @@ jobs:
     uses: ./.github/workflows/cd.yaml
     secrets: inherit
     with:
+      environment: ${{ inputs.environment }}
       layer: ops
 
   app:
@@ -44,4 +54,5 @@ jobs:
     uses: ./.github/workflows/cd.yaml
     secrets: inherit
     with:
+      environment: ${{ inputs.environment }}
       layer: app

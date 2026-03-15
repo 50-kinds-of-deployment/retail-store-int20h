@@ -3,7 +3,7 @@ data "terraform_remote_state" "bootstrap" {
 
   config = {
     bucket = "retail-store-tf-state-eu-central-1"
-    key    = "stage/bootstrap/terraform.tfstate"
+    key    = "${var.bootstrap_state_env}/bootstrap/terraform.tfstate"
     region = "eu-central-1"
   }
 }
@@ -68,6 +68,7 @@ module "dependencies" {
 
   environment_name = var.environment_name
   tags             = local.tags
+  enable_rds       = var.state_env == "stage"
 
   vpc_id     = module.vpc.inner.vpc_id
   subnet_ids = module.vpc.inner.private_subnets

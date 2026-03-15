@@ -37,6 +37,16 @@ resource "helm_release" "app_of_apps" {
   chart = "../../../argocd/app-of-apps"
   name  = "app-of-apps"
 
+  set {
+    name  = "appOfApps.name"
+    value = var.state_env == "prod" ? "app-of-apps-prod" : "app-of-apps"
+  }
+
+  set {
+    name  = "appOfApps.path"
+    value = var.state_env == "prod" ? "argocd/apps-prod" : "argocd/apps"
+  }
+
   wait            = true
   cleanup_on_fail = true
   timeout         = 3600

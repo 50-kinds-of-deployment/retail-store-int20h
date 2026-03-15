@@ -147,6 +147,8 @@ resource "null_resource" "restart_pods" {
 }
 
 resource "kubernetes_annotations" "external_secrets_irsa" {
+  count = var.enable_external_secrets_irsa_annotation ? 1 : 0
+
   api_version = "v1"
   kind        = "ServiceAccount"
   metadata {
@@ -156,5 +158,7 @@ resource "kubernetes_annotations" "external_secrets_irsa" {
   annotations = {
     "eks.amazonaws.com/role-arn" = module.iam_assumable_role_external_secrets.iam_role_arn
   }
+
+  depends_on = [helm_release.app_of_apps]
 }
 
