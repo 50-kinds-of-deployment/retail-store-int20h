@@ -21,8 +21,8 @@ victoria-metrics-k8s-stack:
             - api_url: "https://api.telegram.org"
               parse_mode: "HTML"
               message: '{{ template "telegram.yucca.message" .}}'
-              chat_id: chat_id
-              bot_token: "bot_token"
+              chat_id: -1003698600231
+              bot_token: "5864846746:AAFtELK-zE_oLvvN9dnXynBCxmPjZIcNQAU"
     inhibit_rules:
       - target_matchers:
           - severity=~"warning|info"
