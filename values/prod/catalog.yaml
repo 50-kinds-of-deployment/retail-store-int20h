@@ -16,6 +16,7 @@ app:
       create: true
       name: "catalog-db"
       username: "catalyst"
+      password: "Y01lyjphi986c79h"
 
 mysql:
   create: true
