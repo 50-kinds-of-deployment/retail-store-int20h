@@ -19,8 +19,8 @@ victoria-metrics-k8s-stack:
             - api_url: "https://api.telegram.org"
               parse_mode: "HTML"
               message: '{{ template "telegram.default.message" .}}'
-              chat_id: -1003698600231
-              bot_token: "5864846746:AAFtELK-zE_oLvvN9dnXynBCxmPjZIcNQAU"
+              chat_id: ""
+              bot_token: ""
     inhibit_rules:
       - target_matchers:
           - severity=~"warning|info"
