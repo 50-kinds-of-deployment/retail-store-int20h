@@ -46,6 +46,14 @@ resource "aws_s3_bucket" "retail_store_bucket" {
     "Name"        = "Terraform State Bucket"
   }
 }
+resource "aws_s3_bucket" "retail_store_bucket123" {
+  bucket = "retail-store-tf-state-eu-central-1"
+
+  tags = {
+    "Environment" = "shared"
+    "Name"        = "Terraform State Bucket"
+  }
+}
 
 resource "aws_s3_bucket" "reports_bucket" {
   bucket = "retail-store-reports-bucket"

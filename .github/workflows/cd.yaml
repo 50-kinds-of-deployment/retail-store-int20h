@@ -11,6 +11,11 @@ on:
         description: 'Layer name to deploy (bootstrap, ops, app)'
         required: true
         type: string
+      skip-sentinel:
+        description: 'Skip Sentinel policy checks'
+        required: false
+        type: boolean
+        default: false
 
 
 jobs:
@@ -22,11 +27,20 @@ jobs:
       environment: ${{ inputs.environment }}
       layer: ${{ inputs.layer }}
 
+  sentinel:
+    name: Sentinel Policy Check
+    needs: [plan]
+    uses: ./.github/workflows/terraform-sentinel.yaml
+    secrets: inherit
+    with:
+      layer: ${{ inputs.layer }}
+      skip-sentinel: ${{ inputs.skip-sentinel }}
+
   apply:
     name: Terraform Apply
     # Only run apply if plan detected changes (exit code 2)
     if: ${{ needs.plan.outputs.plan_exitcode == '2' }}
-    needs: [plan]
+    needs: [plan, sentinel]
     uses: ./.github/workflows/terraform-apply.yaml
     secrets: inherit
     with:

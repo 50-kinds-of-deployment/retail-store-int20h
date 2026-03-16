@@ -22,6 +22,11 @@ on:
           - ops
           - app
           - all
+      skip-sentinel:
+        description: 'Skip Sentinel policy checks'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -36,6 +41,7 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
       layer: bootstrap
+      skip-sentinel: ${{ inputs.skip-sentinel }}
 
   ops:
     name: Deploy ops layer
@@ -46,6 +52,7 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
       layer: ops
+      skip-sentinel: ${{ inputs.skip-sentinel }}
 
   app:
     name: Deploy app layer
@@ -56,3 +63,4 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
       layer: app
+      skip-sentinel: ${{ inputs.skip-sentinel }}

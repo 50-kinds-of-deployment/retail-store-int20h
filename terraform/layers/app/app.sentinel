@@ -1,0 +1,11 @@
+# App layer - EKS cluster configuration
+# Policies to enforce app infrastructure standards
+
+# Passthrough policy - allows any configuration
+# Replace this with actual policies for EKS resources
+
+main = rule {
+  true
+}
+
+

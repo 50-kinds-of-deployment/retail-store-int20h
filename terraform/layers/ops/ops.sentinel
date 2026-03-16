@@ -1,0 +1,11 @@
+# Ops layer - IAM and logging configuration
+# Policies to enforce operational infrastructure standards
+
+# Passthrough policy - allows any configuration
+# Replace this with actual policies for IAM, logging, and monitoring resources
+
+main = rule {
+  true
+}
+
+

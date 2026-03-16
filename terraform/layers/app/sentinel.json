@@ -1,0 +1,8 @@
+{
+  "policies": [
+    {
+      "enforcement_level": "advisory",
+      "path": "app.sentinel"
+    }
+  ]
+}

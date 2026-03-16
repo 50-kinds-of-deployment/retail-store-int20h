@@ -1,0 +1,97 @@
+name: Terraform Sentinel Policy Check
+
+on:
+  workflow_call:
+    inputs:
+      layer:
+        description: 'Layer name to analyze (bootstrap, ops, app)'
+        required: true
+        type: string
+      skip-sentinel:
+        description: 'Skip Sentinel policy checks'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  sentinel:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ./terraform/layers/${{ inputs.layer }}
+    env:
+      TF_IN_AUTOMATION: true
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set working directory for layer
+        id: workdir
+        run: |
+          echo "dir=./terraform/layers/${{ inputs.layer }}" >> $GITHUB_OUTPUT
+        working-directory: .
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Install Sentinel
+        run: |
+          wget https://releases.hashicorp.com/sentinel/0.40.0/sentinel_0.40.0_linux_amd64.zip
+          unzip sentinel_0.40.0_linux_amd64.zip
+          sudo mv sentinel /usr/local/bin/
+          rm sentinel_0.40.0_linux_amd64.zip
+          sentinel version
+
+      - name: Download plan artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan-${{ inputs.layer }}
+          path: ${{ steps.workdir.outputs.dir }}
+
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: ${{ steps.workdir.outputs.dir }}
+
+      - name: Run Sentinel Policy Check
+        if: ${{ inputs.skip-sentinel == false }}
+        working-directory: ${{ steps.workdir.outputs.dir }}
+        run: |
+          CONFIG_FILE="sentinel.hcl"
+          if [ ! -f "$CONFIG_FILE" ]; then
+            CONFIG_FILE="sentinel.json"
+          fi
+
+          if [ -f "$CONFIG_FILE" ]; then
+            echo "Running Sentinel policy checks with $CONFIG_FILE..."
+            
+            # Convert tfplan to JSON for Sentinel
+            terraform show -json tfplan > tfplan.json
+            
+            # Determine policy file name based on layer
+            LAYER="${{ inputs.layer }}"
+            POLICY_FILE="${LAYER}.sentinel"
+            
+            if [ -f "$POLICY_FILE" ]; then
+              # Run Sentinel apply. If it fails, the workflow will exit with 1.
+              if ! sentinel apply -config="$CONFIG_FILE"; then
+                echo "Sentinel policy checks failed"
+                exit 1
+              fi
+              echo "Sentinel policy checks passed"
+            else
+              echo "No policy file found ($POLICY_FILE), skipping checks"
+            fi
+          else
+            echo "No Sentinel configuration found (sentinel.hcl or sentinel.json), skipping checks"
+          fi
